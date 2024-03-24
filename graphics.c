@@ -9,10 +9,10 @@ const int BOXSIZE =3;
 const int numOfBoxes =10;
 const int SCREENX = 320;
 const int SCREENY = 240;
-const int GRAVITY = 1;
-const int PLAYER_LOC_Z = -200;
-const int GROUND_Y = -200;
-const int OPPONENT_LOC_Z = -1200;
+const int GRAVITY = 10;
+const int PLAYER_LOC_Z = -250;
+const int GROUND_Y = -350;
+const int OPPONENT_LOC_Z = -1000;
 
 bool correctHit =false;
 
@@ -45,6 +45,7 @@ struct ball{
 	short int colour;
 	short int pastScreenLoc[2];
 	short int velocity[3];
+	
 };
 
 short int colour_packing(short int R, short int G,short  int B);
@@ -62,24 +63,25 @@ void projectPixel(short int colour, short int point3D[3], short int origin[3],
 short int *x, short int *y);
 void eraseSimpleBall(struct ball gameBall);
 void simpleDrawBall(struct ball *gameBall, short int origin[3]);
+void updateLocation(struct ball *gameBall);
 
 int main(void)
 {
-	int origin[3] = {0,0,0};
+	short int origin[3] = {0,100,0};
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
     // declare other variables(not shown)
 	struct ball gameBall;
     // initialize location and direction of rectangles
-	gameBall.centre[0] = 0;
-	gameBall.centre[1] = -150;
-	gameBall.centre[2] = -210;
+	gameBall.centre[0] = -200;
+	gameBall.centre[1] = GROUND_Y+100;
+	gameBall.centre[2] = PLAYER_LOC_Z-10;
 	gameBall.colour = colour_packing(31, 0,0);
 	gameBall.radius = 10;//no effect atm
 	gameBall.pastScreenLoc[0] = 0;//initillise to anything
 	gameBall.pastScreenLoc[1] = 0;
-	gameBall.velocity[0] = 1;
-	gameBall.velocity[1] = 2;
-	gameBall.velocity[2] = -5;
+	gameBall.velocity[0] = 10;
+	gameBall.velocity[1] = 30;
+	gameBall.velocity[2] = -70;
 
 
     /* set front pixel buffer to Buffer 1 */
@@ -98,6 +100,12 @@ int main(void)
 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+	
+	simpleDrawBall(&gameBall, origin); 
+	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+	
+	
     while (1)
     {
 		if(gameBall.centre[2] <= OPPONENT_LOC_Z||gameBall.centre[2] >= PLAYER_LOC_Z){
@@ -116,7 +124,11 @@ int main(void)
         pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 		correctHit = false;
     }
+	
 
+}
+void graphics(){
+	
 }
 
 // code for subroutines (not shown)
@@ -213,32 +225,45 @@ float dotProduct(int A[3], int B[3]){
     return A[0]*B[0] + A[1]*B[1] + A[2]*B[2];
     
 }
+//following function only works with camera shifting vertically
 void projectPixel(short int colour, short int point3D[3], short int origin[3],
 short int *x, short int *y){
     float dz = point3D[2]-origin[2];
     if (dz ==0){
         return;
     }
-    float dx = point3D[0]-origin[0];
+    float dx = (float)point3D[0]-(float)origin[0];
     float dy = point3D[1]-origin[1];
+	printf("dy: %f, dz: %f\n", dy, dz);
+	printf("point3dy %hu, %hu, %f\n", point3D[1],origin[1] , ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1]);
     *x = ((dx/-dz)*(float)SCREENX/2)+SCREENX/2;
-    *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2;
-	//printf("x location screen %d", *x);
-	//printf("\n");
-	//printf("y location screen %d", *y);
-	//printf("\n");
-	if(*y>=SCREENY||*y<0||*x<0||*x>=SCREENX){
+    *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1];
+	//*y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2;
+	
+	printf("x location screen %d, ", *x);
+	printf("\n");
+	printf("y location screen %d", *y);
+	printf("\n");
+	if(*y>=SCREENY-1||*y<0||*x<0||*x>=SCREENX-1){
+		printf("not drawing");
 		return;
 	}
     plot_pixel(*x,*y,colour);
+	plot_pixel(*x+1,*y,colour);
+	plot_pixel(*x+1,*y+1,colour);
+	plot_pixel(*x,*y+1,colour);
 }
 void simpleDrawBall(struct ball *gameBall, short int origin[3]){
+	//printf("origin location screen %d, %d, %d, \n", origin[0],origin[1],origin[2]);
 	(*gameBall).pastScreenLoc[0] = (*gameBall).screenLoc[0];
 	(*gameBall).pastScreenLoc[1] = (*gameBall).screenLoc[1];
 	projectPixel((*gameBall).colour, (*gameBall).centre, origin, &((*gameBall).screenLoc[0]),&((*gameBall).screenLoc[1]));
 }
 void eraseSimpleBall(struct ball gameBall){
 	plot_pixel(gameBall.pastScreenLoc[0],gameBall.pastScreenLoc[1],0);
+	plot_pixel(gameBall.pastScreenLoc[0]+1,gameBall.pastScreenLoc[1],0);
+	plot_pixel(gameBall.pastScreenLoc[0],gameBall.pastScreenLoc[1]+1,0);
+	plot_pixel(gameBall.pastScreenLoc[0]+1,gameBall.pastScreenLoc[1]+1,0);
 }
 
 void updateLocation(struct ball *gameBall){ //only bounded in z, y direction
@@ -247,7 +272,7 @@ void updateLocation(struct ball *gameBall){ //only bounded in z, y direction
 	}
 	if(correctHit){
 		(*gameBall).velocity[0] = -1*(*gameBall).velocity[0]; //change this to something depending on 
-		(*gameBall).velocity[1] =  -10;
+		(*gameBall).velocity[1] =  -5;
 		(*gameBall).velocity[2]= -1*(*gameBall).velocity[2];
 	}
 	//change position based on current velocity
