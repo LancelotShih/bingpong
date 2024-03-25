@@ -15,6 +15,7 @@ int difficulty = 3;
 int winScore;
 int turnTracker = 0;  // 0 is Player, 1 is CPU
 int defaultTime;
+int hitTimer;
 int speedupMultiplier = 0.95;
 
 int currPos = 2;
@@ -33,34 +34,28 @@ int main() {
 }
 
 void updateGame() {  // this should be where most of the game logic happens
-    // update the game state
-
-    if (turnTracker == 0) {
-        // user turn
-        int hitTimer = defaultTime * speedupMultiplier;  // in ms
-        while (hitTimer != 0) {
-            PS_2INPUT();
-            if (flagLeft || flagRight) {
-                playerHitter();
-            }
-            sleep(0.001);
-            hitTimer = hitTimer - 1;
-        }
-    } else if (turnTracker == 1) {
+    if (turnTracker == 0){
+        // player turn 
+        playerHitter();
+    } else if (turnTracker == 1){
         // CPU turn 
         if(winScore != score){
-            nextPos = CPUhitter();
+            CPUhitter();
         } else if (winScore == score){
             handleGameover();
         }
     }
 
-    // update score
     score = score++;
 }
 
 void startGame() {
-    PS_2STARTGAME();  // waits for start button to be pressed on the keyboard
+    while(1){
+        PS_2STARTGAME();  // waits for start button to be pressed on the keyboard
+        if(gameover == true){
+            break;
+        }
+    }
     resetGame();
 }
 
@@ -69,8 +64,10 @@ void resetGame() {
     flagLeft = 0;
     flagRight = 0;
     gameover = false;
-    difficulty = 0;
+    difficulty = 1;
 }
+
+
 
 void difficultySelect() {
     srand(time(NULL));  // Seed the random number generator with current time
@@ -80,15 +77,15 @@ void difficultySelect() {
     if (difficulty == 1) {
         lowerBound = 10;
         upperBound = 15;
-        defaultTime = 2000;
+        hitTimer = 2000;
     } else if (difficulty == 2) {
         lowerBound = 15;
         upperBound = 25;
-        defaultTime = 1800;
+        hitTimer = 1800;
     } else if (difficulty == 3) {
         lowerBound = 25;
         upperBound = 35;
-        defaultTime = 1500;
+        hitTimer = 1500;
     } else {
         printf("Invalid difficulty level\n");
         return;
@@ -98,14 +95,50 @@ void difficultySelect() {
 }
 
 void handleGameover(){
-
-}
-
-int playerHitter(){
     
+    if(winScore != score){
+        printf("you lost");
+    } else if(winScore == score){
+        printf("you won!");
+    }
+
+    resetGame();
 }
 
-int CPUhitter(){
+void playerHitter(){
+    // initialize the hit timer for this cycle
+    int tempHitTimer = hitTimer; // save for reset later 
+    hitTimer = hitTimer * speedupMultiplier;
+
+    while(hitTimer != 0){
+        PS_2INPUT;
+        if(hitTimer > 750 && hitTimer < 1500 && currPos == 2 && flagLeft == 1) { // early hit left side
+            nextPos = 0;
+            callgraphics(); // perhaps?
+            break;
+        } else if (hitTimer < 750 && currPos == 2 && flagLeft == 1){ // late hit left side
+            nextPos = 1;
+            break;
+        } else if(hitTimer > 750 && hitTimer < 1500 && currPos == 3 && flagRight == 1) { // early hit right side
+            nextPos = 0;
+            break;
+        } else if (hitTimer < 750 && currPos == 2 && flagRight == 1){ // late hit right side
+            nextPos = 1;
+            break;
+        } else {
+            handleGameover();
+            break;
+        }
+        hitTimer = hitTimer - 1;
+        sleep(0.001);
+    }
+    // reset the hit timer before exiting the playerHitter loop
+    hitTimer = tempHitTimer;
+    return;
+
+}
+
+void CPUhitter(){
     time_t t;
 
     /* Intializes random number generator */
@@ -113,5 +146,5 @@ int CPUhitter(){
     int inextPos = (rand() % 2);
     printf("%d\n", inextPos);
     
-    return inextPos + 2;
+    nextPos = inextPos; // generates the nextPos value after calling CPUhitter to be a 2 or a 3
 }
