@@ -5,6 +5,7 @@
 
 int flagLeft = 0;
 int flagRight = 0;
+bool gameover = true;
 
 void HEX_PS2(char, char, char);
 
@@ -36,6 +37,35 @@ void PS_2INPUT(){
             *(PS2_ptr) = 0xF4;        // 11111000
         }
     }
+}
+
+void PS_2STARTGAME(){
+    volatile int *PS2_ptr = (int *)PS2_BASE;
+    int PS2_data, RVALID;
+    char byte1 = 0, byte2 = 0, byte3 = 0;
+
+    *(PS2_ptr) = 0xFF;
+
+    while(1){
+        PS2_data = *(PS2_ptr);
+        RVALID = PS2_data & 0x8000;
+        if (RVALID) {
+            byte1 = byte2;
+            byte2 = byte3;
+            byte3 = PS2_data & 0xFF;
+            
+        if (byte1 == 0x34){
+            gameover = !gameover;
+        }
+
+        if ((byte2 == (char)0xAA) &&
+            (byte3 == (char)0x00))  // 10101010 and 00000000
+            *(PS2_ptr) = 0xF4;        // 11111000
+        }
+        
+
+    }
+
 }
 
 void HEX_PS2(char b1, char b2, char b3) {
