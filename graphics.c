@@ -8,10 +8,10 @@ short int Buffer2[240][512];
 
 const int SCREENX = 320;
 const int SCREENY = 240;
-const int GRAVITY = 10;
+const int GRAVITY = 2;
 const int PLAYER_LOC_Z = -250;
 const int GROUND_Y = -370;
-const int OPPONENT_LOC_Z = -900;
+const int OPPONENT_LOC_Z = -1100;
 short int origin[3] = {0,100,0};
 struct ball gameBall;
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
@@ -33,7 +33,7 @@ struct plane{
 
 struct ball{
 	short int radius;
-	short int centre[3];
+	float centre[3];
 	short int screenLoc[2];
 	short int colour;
 	short int pastScreenLoc[2];
@@ -50,30 +50,22 @@ void colour_unpack();
 float hitBall(struct ball ball, int origin[3], float viewDir[3]);
 void drawPlane(struct plane, int origin[3]);
 void drawBall(struct ball ball, int origin[3], int short colour);
-void projectPixel(short int colour, short int point3D[3], short int origin[3],
+void projectPixel(short int colour, float point3D[3], short int origin[3],
 short int *x, short int *y);
 void eraseSimpleBall(struct ball gameBall);
 void simpleDrawBall(struct ball *gameBall, short int origin[3]);
 void updateLocation(struct ball *gameBall);
+void setUpGame( short int startPosition, short int hitTime);
 
 int main(void)
 {
 	short int origin[3] = {0,100,0};
-    
+    gameBall.colour = colour_packing(31, 0,0);
+	gameBall.radius = 10;//no effect atm
     // declare other variables(not shown)
 	
     // initialize location and direction of rectangles
-	gameBall.centre[0] = -260;
-	gameBall.centre[1] = GROUND_Y+20;
-	gameBall.centre[2] = PLAYER_LOC_Z-10;
-	gameBall.colour = colour_packing(31, 0,0);
-	gameBall.radius = 10;//no effect atm
-	gameBall.pastScreenLoc[0] = 0;//initillise to anything
-	gameBall.pastScreenLoc[1] = 0;
-	gameBall.velocity[0] = 10;
-	gameBall.velocity[1] = 30;
-	gameBall.velocity[2] = -70;
-
+	
 
     /* set front pixel buffer to Buffer 1 */
     *(pixel_ctrl_ptr + 1) = (int) &Buffer1; // first store the address in the  back buffer
@@ -93,43 +85,28 @@ int main(void)
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
 	//Testing
-	simpleDrawBall(&gameBall, origin); 
-	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
-	
-	/*
-    while (1)
-    {
-		if(gameBall.centre[2] <= OPPONENT_LOC_Z||gameBall.centre[2] >= PLAYER_LOC_Z){
-			correctHit = true;
+	setUpGame( 0, 500);
+	for (int i = 0; i<100; i++){
+		updateFrame();
+		if(gameBall.centre[2]>=PLAYER_LOC_Z||gameBall.centre[2]>=PLAYER_LOC_Z){
+			bounceBall(300, 3, 1);
 		}
-		//erase
-        eraseSimpleBall(gameBall);
-		//gameBall.centre[0] +=1;
-		//gameBall.centre[1] +=1;
-		
-		
-		simpleDrawBall(&gameBall, origin); 
-		updateLocation(&gameBall);
-
-        wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-        pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
-		correctHit = false;
-    }
-	*/
+	}
 	
-
+	
+	
 	
 }
+
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition){ 
 	eraseSimpleBall(gameBall);
-	gameBall.velocity[1] = -((gameBall.centre[1]-GROUND_Y)-0.5*GRAVITY*(hitTime*60.0/1000.0)*hitTime*60.0/1000.0)*1000.0/(60.0*hitTime);
+	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
 	if (startPosition == 0){
 		if(nextPosition == 2){
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 3){
-			gameBall.velocity[0] = -PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+			gameBall.velocity[0] = -PLAYER_LOC_Z*3/2/(float)hitTime/1000.0*60;
 		}
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 	}
@@ -182,26 +159,26 @@ void setUpGame( short int startPosition, short int hitTime){
 	eraseSimpleBall(gameBall);
 	if (startPosition == 0){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.velocity[0] = -PLAYER_LOC_Z*3.0/2.0/(float)hitTime/1000.0*60;
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 
 	}
 	else if(startPosition == 2){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.velocity[0] = -PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
 	else if (startPosition == 1){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.velocity[0] = PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 	}
 	else if(startPosition == 3){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.velocity[0] = PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
@@ -209,10 +186,10 @@ void setUpGame( short int startPosition, short int hitTime){
 	gameBall.centre[1] = GROUND_Y+100; //100 = height from table 
 	gameBall.pastScreenLoc[0] = 0;
 	gameBall.pastScreenLoc[1] = 0;
-	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*60.0/1000.0)*hitTime*60.0/1000.0)*1000.0/(60.0*hitTime);
+	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
 	simpleDrawBall(&gameBall, origin); 
 	updateLocation(&gameBall);
-
+	printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
@@ -313,7 +290,7 @@ float dotProduct(int A[3], int B[3]){
     
 }
 //following function only works with camera shifting vertically
-void projectPixel(short int colour, short int point3D[3], short int origin[3],
+void projectPixel(short int colour, float point3D[3], short int origin[3],
 short int *x, short int *y){
     float dz = point3D[2]-origin[2];
     if (dz ==0){
@@ -323,7 +300,6 @@ short int *x, short int *y){
     float dy = point3D[1]-origin[1];
     *x = ((dx/-dz)*(float)SCREENX/2)+SCREENX/2;
     *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1];
-	//*y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2;
 	
 	printf("x location screen %d, ", *x);
 	printf("\n");
@@ -348,6 +324,7 @@ void simpleDrawBall(struct ball *gameBall, short int origin[3]){
 		(*gameBall).velocity[0] = 0;
 		(*gameBall).velocity[1] = 0;
 		(*gameBall).velocity[2] = 0;
+		
 	}
 	
 }
@@ -361,6 +338,8 @@ void eraseSimpleBall(struct ball gameBall){
 void updateLocation(struct ball *gameBall){ //only bounded in z, y direction
 	if((*gameBall).centre[1]<= GROUND_Y){
 		(*gameBall).velocity[1] =  (*gameBall).velocity[1]*(-1);
+		printf("Bounced");
+		plot_pixel(0,0,100000);
 	}
 	//change position based on current velocity
 	//printf("pre x: %d, y: %d,, z: %d \n", (*gameBall).centre[0],(*gameBall).centre[1],(*gameBall).centre[2]);
