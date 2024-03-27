@@ -202,7 +202,7 @@ void setUpGame(short int startPosition, short int hitTime){
 	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
 	simpleDrawBall(origin); 
 	updateLocation();
-	printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
+	//printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
@@ -314,10 +314,10 @@ short int *x, short int *y){
     *x = ((dx/-dz)*(float)SCREENX/2)+SCREENX/2;
     *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1];
 	//printf(" 3d x %f, y %f, z, %f", point3D[0],point3D[1],point3D[2]);
-	printf("x location screen %d, ", *x);
-	printf("\n");
-	printf("y location screen %d", *y);
-	printf("\n");
+	//printf("x location screen %d, ", *x);
+	//printf("\n");
+	//printf("y location screen %d", *y);
+	//printf("\n");
 	if(*y>=SCREENY-1||*y<0||*x<0||*x>=SCREENX-1){//ensures pixel not drawn outside if screen
 		return;
 	}
@@ -356,7 +356,7 @@ void eraseSimpleBall(){
 void updateLocation(){ //only bounded in z, y direction
 	if(gameBall.centre[1]<= GROUND_Y){
 		gameBall.velocity[1] =  gameBall.velocity[1]*(-1);
-		printf("Bounced");
+		//printf("Bounced");
 		plot_pixel(0,0,100000);
 	}
 	//change position based on current velocity
