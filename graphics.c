@@ -41,6 +41,7 @@ struct ball{
 	
 };
 
+
 short int colour_packing(short int R, short int G,short  int B);
 void plot_pixel(int x, int y, short int line_color);
 void wait_for_vsync();
@@ -56,6 +57,8 @@ void eraseSimpleBall();
 void simpleDrawBall(short int origin[3]);
 void updateLocation();
 void setUpGame( short int startPosition, short int hitTime);
+void updateFrame();
+void bounceBall(short int hitTime, short int startPosition, short int nextPosition);
 
 int main(void)
 {
