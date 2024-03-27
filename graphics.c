@@ -85,11 +85,14 @@ int main(void)
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
 	//Testing
-	setUpGame( 0, 500);
-	for (int i = 0; i<100; i++){
+	setUpGame( 1, 500);
+	for (int i = 0; i<200; i++){
 		updateFrame();
-		if(gameBall.centre[2]>=PLAYER_LOC_Z||gameBall.centre[2]>=PLAYER_LOC_Z){
-			bounceBall(300, 3, 1);
+		if(gameBall.centre[2]>=PLAYER_LOC_Z){
+			bounceBall(500, 3, 1);
+		}
+		if(gameBall.centre[2]<OPPONENT_LOC_Z){
+			bounceBall(500, 1, 3);
 		}
 	}
 	
@@ -102,39 +105,47 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 	eraseSimpleBall(gameBall);
 	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
 	if (startPosition == 0){
+		gameBall.centre[0] = PLAYER_LOC_Z/2;
+		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 		if(nextPosition == 2){
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 3){
-			gameBall.velocity[0] = -PLAYER_LOC_Z*3/2/(float)hitTime/1000.0*60;
+			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		}
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 	}
 
 	else if(startPosition == 2){
+		gameBall.centre[0] = PLAYER_LOC_Z/2;
+		gameBall.centre[2] = PLAYER_LOC_Z-1;
 		if(nextPosition == 0){
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 3){
-			gameBall.velocity[0] = -PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		}
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 	}
 	else if (startPosition == 1){
+		gameBall.centre[0] = -PLAYER_LOC_Z/2;
+		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 		if(nextPosition == 3){
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 2){
-			gameBall.velocity[0] = PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		}
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 	}
 	else if(startPosition == 3){
+		gameBall.centre[0] = -PLAYER_LOC_Z/2;
+		gameBall.centre[2] = PLAYER_LOC_Z-1;
 		if(nextPosition == 1){
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 0){
-			gameBall.velocity[0] = PLAYER_LOC_Z*(6.0/5.0)/(float)hitTime/(float)(1000.0/60.0);
+			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		}
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 	}
@@ -158,27 +169,27 @@ void updateFrame(){
 void setUpGame( short int startPosition, short int hitTime){
 	eraseSimpleBall(gameBall);
 	if (startPosition == 0){
-		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z*3.0/2.0/(float)hitTime/1000.0*60;
+		gameBall.centre[0] = PLAYER_LOC_Z/2;
+		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 
 	}
 	else if(startPosition == 2){
-		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.centre[0] = PLAYER_LOC_Z/2;
+		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
 	else if (startPosition == 1){
-		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.centre[0] = -PLAYER_LOC_Z/2;
+		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 	}
 	else if(startPosition == 3){
-		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z*3.0/2.0/(float)hitTime/(float)(1000.0/60.0);
+		gameBall.centre[0] = -PLAYER_LOC_Z/2;
+		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
 		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
@@ -300,7 +311,7 @@ short int *x, short int *y){
     float dy = point3D[1]-origin[1];
     *x = ((dx/-dz)*(float)SCREENX/2)+SCREENX/2;
     *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1];
-	
+	printf(" 3d x %f, y %f, z, %f", point3D[0],point3D[1],point3D[2]);
 	printf("x location screen %d, ", *x);
 	printf("\n");
 	printf("y location screen %d", *y);
