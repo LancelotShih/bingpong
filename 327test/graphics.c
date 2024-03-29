@@ -1,9 +1,8 @@
-#include <stdlib.h> 
-#include <stdbool.h>
-#include <stdio.h>
-#include <math.h>
+#include "stdlib.h"
+#include "stdbool.h"
+#include "stdio.h"
 #include "graphics.h"
-#include "address_map_nios2.h"
+
  int pixel_buffer_start; // global variable
 short int Buffer1[240][512]; // 240 rows, 512 (320 + padding) columns
 short int Buffer2[240][512];
@@ -15,33 +14,13 @@ const int PLAYER_LOC_Z = -250;
 const int GROUND_Y = -370;
 const int OPPONENT_LOC_Z = -1100;
 short int origin[3] = {0,100,0};
-struct ball gameBall;
+struct ball gameBall = {};
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
 
 bool correctHit =false;
 
 int position[3];//gloabal position variable
 
-struct plane{
-	int length;
-	int width; 
-	int point1[3];
-	int point2[3];//x,y,z
-	int point3[3];
-	int point4[3];
-	short int colour;
-};
-
-
-struct ball{
-	short int radius;
-	float centre[3];
-	short int screenLoc[2];
-	short int colour;
-	short int pastScreenLoc[2];
-	float velocity[3];
-	
-};
 
 void startGraphics();
 short int colour_packing(short int R, short int G,short  int B);
@@ -89,16 +68,7 @@ void startGraphics()
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
 	//Testing
-	setUpGame( 1, 500);
-	for (int i = 0; i<200; i++){
-		updateFrame();
-		if(gameBall.centre[2]>=PLAYER_LOC_Z){
-			bounceBall(500, 3, 1);
-		}
-		if(gameBall.centre[2]<OPPONENT_LOC_Z){
-			bounceBall(500, 1, 3);
-		}
-	}
+	
 	
 	
 	

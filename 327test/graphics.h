@@ -1,7 +1,6 @@
 #ifndef graphics_h
 #define graphics_h
-#include <stdbool.h>
-
+#include "stdbool.h"
 extern int pixel_buffer_start; // global variable
 extern short int Buffer1[240][512]; // 240 rows, 512 (320 + padding) columns
 extern short int Buffer2[240][512];

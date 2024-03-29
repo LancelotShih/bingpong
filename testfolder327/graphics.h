@@ -1,5 +1,6 @@
 #ifndef graphics_h
 #define graphics_h
+#include <stdbool.h>
 
 extern int pixel_buffer_start; // global variable
 extern short int Buffer1[240][512]; // 240 rows, 512 (320 + padding) columns
@@ -15,7 +16,28 @@ extern short int origin[3];
 extern struct ball gameBall;
 extern volatile int * pixel_ctrl_ptr;
 
-extern bool correctHit =false;
+struct plane{
+	int length;
+	int width; 
+	int point1[3];
+	int point2[3];//x,y,z
+	int point3[3];
+	int point4[3];
+	short int colour;
+};
+
+
+struct ball{
+	short int radius;
+	float centre[3];
+	short int screenLoc[2];
+	short int colour;
+	short int pastScreenLoc[2];
+	float velocity[3];
+	
+};
+
+extern bool correctHit;
 
 extern int position[3];//gloabal position variable
 
