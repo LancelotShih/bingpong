@@ -1,7 +1,8 @@
 #include <stdlib.h> 
 #include <stdbool.h>
 #include <stdio.h>
-#include <math.h>
+#include <graphics.h>
+
  int pixel_buffer_start; // global variable
 short int Buffer1[240][512]; // 240 rows, 512 (320 + padding) columns
 short int Buffer2[240][512];
@@ -13,44 +14,24 @@ const int PLAYER_LOC_Z = -250;
 const int GROUND_Y = -370;
 const int OPPONENT_LOC_Z = -1100;
 short int origin[3] = {0,100,0};
-struct ball gameBall;
+struct ball gameBall = {};
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
 
 bool correctHit =false;
 
 int position[3];//gloabal position variable
 
-struct plane{
-	int length;
-	int width; 
-	int point1[3];
-	int point2[3];//x,y,z
-	int point3[3];
-	int point4[3];
-	short int colour;
-};
 
-
-struct ball{
-	short int radius;
-	float centre[3];
-	short int screenLoc[2];
-	short int colour;
-	short int pastScreenLoc[2];
-	float velocity[3];
-	
-};
-
-
+void startGraphics();
 short int colour_packing(short int R, short int G,short  int B);
 void plot_pixel(int x, int y, short int line_color);
 void wait_for_vsync();
 void draw_line(int x0, int y0, int x1, int y1,short int line_colour);
 void clear_screen();
-void colour_unpack();
-float hitBall(struct ball ball, int origin[3], float viewDir[3]);
-void drawPlane(struct plane, int origin[3]);
-void drawBall(struct ball ball, int origin[3], int short colour);
+// void colour_unpack();
+// float hitBall(struct ball ball, int origin[3], float viewDir[3]);
+// void drawPlane(struct plane, int origin[3]);
+// void drawBall(struct ball ball, int origin[3], int short colour);
 void projectPixel(short int colour, float point3D[3], short int origin[3],
 short int *x, short int *y);
 void eraseSimpleBall();
@@ -60,16 +41,13 @@ void setUpGame( short int startPosition, short int hitTime);
 void updateFrame();
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition);
 
-int main(void)
+void startGraphics()
 {
 	short int origin[3] = {0,100,0};
     gameBall.colour = colour_packing(31, 0,0);
 	gameBall.radius = 10;//no effect atm
     // declare other variables(not shown)
 	
-    // initialize location and direction of rectangles
-	
-
     /* set front pixel buffer to Buffer 1 */
     *(pixel_ctrl_ptr + 1) = (int) &Buffer1; // first store the address in the  back buffer
     /* now, swap the front/back buffers, to set the front buffer location */
@@ -85,21 +63,6 @@ int main(void)
 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
-	
-	//Testing
-	setUpGame( 1, 500);
-	for (int i = 0; i<200; i++){
-		updateFrame();
-		if(gameBall.centre[2]>=PLAYER_LOC_Z){
-			bounceBall(500, 3, 1);
-		}
-		if(gameBall.centre[2]<OPPONENT_LOC_Z){
-			bounceBall(500, 1, 3);
-		}
-	}
-	
-	
-	
 	
 }
 
@@ -202,7 +165,7 @@ void setUpGame(short int startPosition, short int hitTime){
 	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
 	simpleDrawBall(origin); 
 	updateLocation();
-	//printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
+	printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
@@ -314,10 +277,10 @@ short int *x, short int *y){
     *x = ((dx/-dz)*(float)SCREENX/2)+SCREENX/2;
     *y = ((dy/dz)*(float)SCREENY/2)+SCREENY/2-origin[1];
 	//printf(" 3d x %f, y %f, z, %f", point3D[0],point3D[1],point3D[2]);
-	//printf("x location screen %d, ", *x);
-	//printf("\n");
-	//printf("y location screen %d", *y);
-	//printf("\n");
+	printf("x location screen %d, ", *x);
+	printf("\n");
+	printf("y location screen %d", *y);
+	printf("\n");
 	if(*y>=SCREENY-1||*y<0||*x<0||*x>=SCREENX-1){//ensures pixel not drawn outside if screen
 		return;
 	}
@@ -356,7 +319,7 @@ void eraseSimpleBall(){
 void updateLocation(){ //only bounded in z, y direction
 	if(gameBall.centre[1]<= GROUND_Y){
 		gameBall.velocity[1] =  gameBall.velocity[1]*(-1);
-		//printf("Bounced");
+		printf("Bounced");
 		plot_pixel(0,0,100000);
 	}
 	//change position based on current velocity
