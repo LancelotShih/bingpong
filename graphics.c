@@ -10,14 +10,15 @@ short int tempFrame[240*320];
 
 const int SCREENX = 320;
 const int SCREENY = 240;
-const int GRAVITY = 2;
+
 const int PLAYER_LOC_Z = -250;
 const int GROUND_Y = -350;
 const int OPPONENT_LOC_Z = -1100;
 short int origin[3] = {0,90,0};
-const short int heightBall=50;
+const short int heightBall=30;
 struct ball gameBall ;
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+float GRAVITY = 2;
 
 
 int position[3];//gloabal position variable
@@ -45,6 +46,7 @@ void initilizePlane();
 void drawPlane();
 void saveFrame();
 void drawImgBackground(const short image[]);
+scaleGravity(int hitTime)
 
 void saveFrame(){
 	short int *one_pixel_address;
@@ -142,10 +144,37 @@ void drawPlane(){
 	}
 
 }
+void scaleGravity(int hitTime){
+	//adapt gravity based on ball speed - values chosen based on what looks good
+    /*
+    <15 g = 12
+    15 - 20 g =8
+    20-25 g = 5
+    25 - 30 - g = 3
+    30 - 60 g = 1.5
+    */
+    if(hitTime <15){
+    	GRAVITY = 12;
+    }
+    else if(hitTime <20){
+    	GRAVITY = 8;
+    }
+    else if(hitTime <25){
+    	GRAVITY = 5;
+    }
+    else if(hitTime <30){
+    	GRAVITY = 3;
+    }
+    else if(hitTime <60){
+    	GRAVITY = 1.5;
+    }
+    else{
+    	GRAVITY = 0.8;
+    }
+}
 
 void startGraphics()
 {
-	short int origin[3] = {0,90,0};
     gameBall.colour = colour_packing(31, 0,0);
 	gameBall.radius = 10;//no effect atm
     // declare other variables(not shown)
@@ -170,6 +199,7 @@ void startGraphics()
 
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition){ 
 	eraseSimpleBall();
+	scaleGravity(hitTime);
 	//gameBall.centre[1] = GROUND_Y+heightBall;
 	gameBall.velocity[1] = -((gameBall.centre[1]-GROUND_Y)-0.5*GRAVITY*(hitTime*(3.0/4.0))*hitTime*(3.0/4.0))/(hitTime*(3.0/4.0));
 	if (startPosition == 0){
@@ -236,6 +266,7 @@ void updateFrame(){
 //used for serves -always diagonal
 void setUpGame(short int startPosition, short int hitTime){
 	eraseSimpleBall();
+	 scaleGravity(hitTime);
 	if (startPosition == 0){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
 		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime;
