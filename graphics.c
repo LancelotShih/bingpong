@@ -6,18 +6,19 @@
  int pixel_buffer_start; // global variable
 short int Buffer1[240][512]; // 240 rows, 512 (320 + padding) columns
 short int Buffer2[240][512];
+short int tempFrame[240*320];
 
 const int SCREENX = 320;
 const int SCREENY = 240;
 const int GRAVITY = 2;
 const int PLAYER_LOC_Z = -250;
-const int GROUND_Y = -370;
+const int GROUND_Y = -350;
 const int OPPONENT_LOC_Z = -1100;
-short int origin[3] = {0,100,0};
-struct ball gameBall = {};
+short int origin[3] = {0,90,0};
+const short int heightBall=50;
+struct ball gameBall ;
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
 
-bool correctHit =false;
 
 int position[3];//gloabal position variable
 
@@ -40,10 +41,111 @@ void updateLocation();
 void setUpGame( short int startPosition, short int hitTime);
 void updateFrame();
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition);
+void initilizePlane();
+void drawPlane();
+void saveFrame();
+void drawImgBackground(const short image[]);
+
+void saveFrame(){
+	short int *one_pixel_address;
+	for(int x = 0; x<SCREENX; x++){
+		for(int y=0; y<SCREENY; y++){
+			one_pixel_address = pixel_buffer_start + (y << 10) + (x << 1);
+			tempFrame[x+y*SCREENY] = *one_pixel_address;
+		}
+	}
+}
+void drawImgBackground(const short image[]){ 
+	//draws static image on both buffers, will stay there, no neeed to redraw
+	for(int x = 0; x<SCREENX; x++){
+		for(int y=0; y<SCREENY; y++){
+			plot_pixel(x,y,image[x+y*SCREENX]);
+		}
+	}
+	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+	for(int x = 0; x<SCREENX; x++){
+		for(int y=0; y<SCREENY; y++){
+			plot_pixel(x,y,image[x+y*SCREENX]);
+		}
+	}
+	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+	
+}
+
+void initilizePlane(){
+    table.colour = colour_packing(30,17,0);
+    float tempCorner[3] ={(float)PLAYER_LOC_Z, (float)GROUND_Y,(float)OPPONENT_LOC_Z};//start witth top left corner
+    projectPixel(table.colour, tempCorner, origin, &(table.point1[0]),&(table.point1[1]));
+    //plot_pixel(table.point1[0], table.point1[1],table.colour);
+    //top right corner
+    tempCorner[0] = -(float)PLAYER_LOC_Z;
+    tempCorner[1] = (float)GROUND_Y;
+    tempCorner[2] = (float)OPPONENT_LOC_Z;
+    projectPixel(table.colour, tempCorner, origin, &(table.point2[0]), &(table.point2[1]));
+   // plot_pixel(table.point2[0], table.point2[1],table.colour);
+    //bottom left corner
+    tempCorner[0] = (float)PLAYER_LOC_Z+10;//to get ball off of edge add 10
+    tempCorner[1] = (float)GROUND_Y;
+    tempCorner[2] = (float)PLAYER_LOC_Z-20;
+    projectPixel(table.colour, tempCorner,origin, &(table.point3[0]), &(table.point3[1]));
+    //plot_pixel(table.point3[0], table.point3[1],table.colour);
+    //bottom right corner
+    tempCorner[0] = -(float)PLAYER_LOC_Z-10;
+    tempCorner[1] = (float)GROUND_Y;
+    tempCorner[2] = (float)PLAYER_LOC_Z-20;
+    projectPixel(table.colour, tempCorner, origin, &(table.point4[0]), &(table.point4[1]));
+    //plot_pixel(table.point4[0], table.point4[1],table.colour);
+}
+
+void drawPlane(){
+	short int x0Left = table.point1[0];
+	short int y0Left = table.point1[1];
+	short int x1Left = table.point3[0];
+	short int y1Left = table.point3[1];
+
+	short int x0Right = table.point2[0];
+	short int y0Right = table.point2[1];
+	short int x1Right = table.point4[0];
+	short int y1Right = table.point4[1];
+	short int temp;
+
+	int deltayLeft = y1Right-y0Right;
+	int deltayRight = y1Right-y0Right;
+	int deltaxRight = abs(x1Right-x0Right);
+	int deltaxLeft = abs(x1Left-x0Left);
+	int errorRight = -(deltayRight/2);
+	int errorLeft = -(deltayLeft/2);
+	int xRight= x0Right;
+	int xLeft = x0Left;
+	int x_stepLeft=-1;
+	int x_stepRight=1;
+	
+
+	for(int yLeft =y0Left; yLeft<y1Left; yLeft++){
+			plot_pixel(xLeft,yLeft,table.colour);
+			for(int across = xLeft+1; across<xRight; across++){
+				plot_pixel(across,yLeft,table.colour);
+			}
+
+		errorRight = errorRight +deltaxRight;
+		errorLeft = errorLeft + deltaxLeft;
+		if(errorRight>0){
+			xRight=xRight+x_stepRight;
+			errorRight = errorRight -deltayRight;
+		}
+		if (errorLeft>0){
+			xLeft=xLeft+x_stepLeft;
+			errorLeft = errorLeft -deltayLeft;
+		}
+	}
+
+}
 
 void startGraphics()
 {
-	short int origin[3] = {0,100,0};
+	short int origin[3] = {0,90,0};
     gameBall.colour = colour_packing(31, 0,0);
 	gameBall.radius = 10;//no effect atm
     // declare other variables(not shown)
@@ -68,7 +170,8 @@ void startGraphics()
 
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition){ 
 	eraseSimpleBall();
-	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
+	//gameBall.centre[1] = GROUND_Y+heightBall;
+	gameBall.velocity[1] = -((gameBall.centre[1]-GROUND_Y)-0.5*GRAVITY*(hitTime*(3.0/4.0))*hitTime*(3.0/4.0))/(hitTime*(3.0/4.0));
 	if (startPosition == 0){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
@@ -76,9 +179,9 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 3){
-			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
+			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime;
 		}
-		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime;
 	}
 
 	else if(startPosition == 2){
@@ -88,9 +191,9 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 3){
-			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
+			gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime;
 		}
-		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime;
 	}
 	else if (startPosition == 1){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
@@ -99,9 +202,9 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 2){
-			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
+			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime;
 		}
-		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime;
 	}
 	else if(startPosition == 3){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
@@ -110,9 +213,9 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 			gameBall.velocity[0] = 0;
 		}
 		else if(nextPosition == 0){
-			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
+			gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime;
 		}
-		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime;
 	}
 	simpleDrawBall(origin); 
 	updateLocation();
@@ -135,37 +238,36 @@ void setUpGame(short int startPosition, short int hitTime){
 	eraseSimpleBall();
 	if (startPosition == 0){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
-		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime;
+		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime;
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 
 	}
 	else if(startPosition == 2){
 		gameBall.centre[0] = PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
-		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[0] = -PLAYER_LOC_Z/(float)hitTime;
+		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime;
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
 	else if (startPosition == 1){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
-		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime;
+		gameBall.velocity[2] = (float)(PLAYER_LOC_Z-OPPONENT_LOC_Z)/(float)hitTime;
 		gameBall.centre[2] = OPPONENT_LOC_Z+1;
 	}
 	else if(startPosition == 3){
 		gameBall.centre[0] = -PLAYER_LOC_Z/2;
-		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime*1000.0/60.0;
-		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime*(1000.0/60.0);
+		gameBall.velocity[0] = PLAYER_LOC_Z/(float)hitTime;
+		gameBall.velocity[2] = (float)(OPPONENT_LOC_Z-PLAYER_LOC_Z)/(float)hitTime;
 		gameBall.centre[2] = PLAYER_LOC_Z-1;
 	}
 	
-	gameBall.centre[1] = GROUND_Y+100; //100 = height from table 
+	gameBall.centre[1] = GROUND_Y+heightBall; //100 = height from table 
 	gameBall.pastScreenLoc[0] = 0;
 	gameBall.pastScreenLoc[1] = 0;
-	gameBall.velocity[1] = -((100)-0.5*GRAVITY*(hitTime*(3.0/4.0)*60.0/1000.0)*hitTime*(3.0/4.0)*60.0/1000.0)*1000.0/(60.0*hitTime*(3.0/4.0));
+	gameBall.velocity[1] = -((heightBall)-0.5*GRAVITY*(hitTime*(3.0/4.0))*hitTime*(3.0/4.0))/(hitTime*(3.0/4.0));
 	simpleDrawBall(origin); 
 	updateLocation();
-	printf("dx = %f, dy =%f, dx = %f \n", gameBall.velocity[0], gameBall.velocity[1], gameBall.velocity[2]); 
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 	
@@ -255,11 +357,6 @@ short int colour_packing(short int R, short int G,short  int B){
 	return colour;
 }
 
-void drawPlane(struct plane plane,int origin[3]){
-	//projeect 3d point using pov location angle
-	//draw_line( x0, int y0, int x1, int y1,short int line_colour);
-	
-}
 
 float dotProduct(int A[3], int B[3]){
     return A[0]*B[0] + A[1]*B[1] + A[2]*B[2];
@@ -292,17 +389,20 @@ short int *x, short int *y){
 void simpleDrawBall( short int origin[3]){
 	gameBall.pastScreenLoc[0] = gameBall.screenLoc[0];
 	gameBall.pastScreenLoc[1] = gameBall.screenLoc[1];
-	projectPixel(gameBall.colour, gameBall.centre, origin, &(gameBall.screenLoc[0]),&(gameBall.screenLoc[1]));
+	
     
 	//safeguard to ensuree ball does not go out of bounds
-	if(gameBall.screenLoc[0]<0||gameBall.screenLoc[0]>=SCREENX||gameBall.screenLoc[1]<0||gameBall.screenLoc[1]>=SCREENY){
-		gameBall.velocity[0] = 0;
-		gameBall.velocity[1] = 0;
-		gameBall.velocity[2] = 0;
-	}
+	//if(gameBall.screenLoc[0]<0||gameBall.screenLoc[0]>=SCREENX||gameBall.screenLoc[1]<0||gameBall.screenLoc[1]>=SCREENY){
+		//gameBall.velocity[0] = 0;
+		//gameBall.velocity[1] = 0;
+		//gameBall.velocity[2] = 0;
+	//}
+	
     if(gameBall.screenLoc[1]>=SCREENY-1||gameBall.screenLoc[1]<0||gameBall.screenLoc[0]<0||gameBall.screenLoc[0]>=SCREENX-1){//ensures pixel not drawn outside if screen
 		return;
 	}
+	projectPixel(gameBall.colour, gameBall.centre, origin, &(gameBall.screenLoc[0]),&(gameBall.screenLoc[1]));
+
     plot_pixel(gameBall.screenLoc[0],gameBall.screenLoc[1],gameBall.colour);
 	plot_pixel(gameBall.screenLoc[0]+1,gameBall.screenLoc[1],gameBall.colour);
 	plot_pixel(gameBall.screenLoc[0]+1,gameBall.screenLoc[1]+1,gameBall.colour);
@@ -310,17 +410,26 @@ void simpleDrawBall( short int origin[3]){
 	
 }
 void eraseSimpleBall(){
-	plot_pixel(gameBall.pastScreenLoc[0],gameBall.pastScreenLoc[1],0);
-	plot_pixel(gameBall.pastScreenLoc[0]+1,gameBall.pastScreenLoc[1],0);
-	plot_pixel(gameBall.pastScreenLoc[0],gameBall.pastScreenLoc[1]+1,0);
-	plot_pixel(gameBall.pastScreenLoc[0]+1,gameBall.pastScreenLoc[1]+1,0);
+	//check where in screen if on board
+	int tempx;
+	int tempy;
+	tempx = gameBall.pastScreenLoc[0];
+	tempy = gameBall.pastScreenLoc[1];
+	plot_pixel(tempx,tempy,tempFrame[tempx +tempy*SCREENY]);
+	tempx = gameBall.pastScreenLoc[0]+1;
+	tempy = gameBall.pastScreenLoc[1];
+	plot_pixel(tempx,tempy,tempFrame[tempx +tempy*SCREENY]);
+	tempx = gameBall.pastScreenLoc[0];
+	tempy = gameBall.pastScreenLoc[1]+1;
+	plot_pixel(tempx,tempy,tempFrame[tempx +tempy*SCREENY]);
+	tempx = gameBall.pastScreenLoc[0]+1;
+	tempy = gameBall.pastScreenLoc[1]+1;
+	plot_pixel(tempx,tempy,tempFrame[tempx +tempy*SCREENY]);
 }
 
 void updateLocation(){ //only bounded in z, y direction
 	if(gameBall.centre[1]<= GROUND_Y){
 		gameBall.velocity[1] =  gameBall.velocity[1]*(-1);
-		printf("Bounced");
-		plot_pixel(0,0,100000);
 	}
 	//change position based on current velocity
 	gameBall.centre[0] += gameBall.velocity[0];
