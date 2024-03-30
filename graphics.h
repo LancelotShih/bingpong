@@ -308,5 +308,5 @@ void initilizePlane();
 void drawPlane();
 void drawImgBackground(const short image[]);
 void saveFrame();
-
+void scaleGravity(int hitTime)
 #endif
