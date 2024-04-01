@@ -251,7 +251,7 @@ extern short int tempFrame[240*320];
 
 extern const int SCREENX;
 extern const int SCREENY;
-extern const int GRAVITY;
+extern float GRAVITY;
 extern const int PLAYER_LOC_Z;
 extern const int GROUND_Y;
 extern const int OPPONENT_LOC_Z;
@@ -279,6 +279,8 @@ struct ball{
 	short int colour;
 	short int pastScreenLoc[2];
 	float velocity[3];
+	short int currentProjectedRadius;
+	short int pastProjectedRadius;
 	
 };
 
@@ -290,7 +292,7 @@ void startGraphics();
 short int colour_packing(short int R, short int G,short  int B);
 void plot_pixel(int x, int y, short int line_color);
 void wait_for_vsync();
-void draw_line(int x0, int y0, int x1, int y1,short int line_colour);
+void draw_line(short int x0, short int y0, short int x1, short int y1,short int line_colour);
 void clear_screen();
 //void colour_unpack();
 //float hitBall(struct ball ball, int origin[3], float viewDir[3]);
@@ -308,5 +310,5 @@ void initilizePlane();
 void drawPlane();
 void drawImgBackground(const short image[]);
 void saveFrame();
-void scaleGravity(int hitTime)
+void scaleGravity(int hitTime);
 #endif
