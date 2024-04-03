@@ -258,6 +258,7 @@ extern const int OPPONENT_LOC_Z;
 extern short int origin[3];
 extern struct ball gameBall;
 extern struct plane table;
+extern struct shadow ballShadow;
 extern volatile int * pixel_ctrl_ptr;
 extern const short int heightBall;
 
@@ -281,6 +282,11 @@ struct ball{
 	float velocity[3];
 	short int currentProjectedRadius;
 	short int pastProjectedRadius;
+	
+};
+struct shadow{
+  short int pastRadiusScreen;
+  short int pastCentre[2];
 	
 };
 
@@ -311,4 +317,7 @@ void drawPlane();
 void drawImgBackground(const short image[]);
 void saveFrame();
 void scaleGravity(int hitTime);
+void drawShadow();
+void eraseShadow();
+
 #endif

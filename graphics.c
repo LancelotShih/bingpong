@@ -18,6 +18,7 @@ short int origin[3] = {0,90,0};
 const short int heightBall=30;
 struct ball gameBall ;
 struct plane table;
+struct shadow ballShadow;
 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
 float GRAVITY = 2;
 
@@ -47,6 +48,78 @@ void drawPlane();
 void saveFrame();
 void drawImgBackground(const short image[]);
 void scaleGravity(int hitTime);
+
+void eraseShadow(){ //change the 50 to larger number if shadow gets large
+    //for(short int x = ballShadow.pastCentre[0]-ballShadow.pastRadiusScreen; x<ballShadow.pastCentre[0]+ballShadow.pastRadiusScreen; x++){
+    for(short int x = ballShadow.pastCentre[0]-50; x<ballShadow.pastCentre[0]+50&&x<SCREENX&&x>0; x++){
+        //for(short int y = ballShadow.pastCentre[1]-ballShadow.pastRadiusScreen; y<ballShadow.pastCentre[1]+ballShadow.pastRadiusScreen; y++){
+        for(short int y = ballShadow.pastCentre[1]-50; y<=ballShadow.pastCentre[1]+50&&y<SCREENY&&y>0; y++){
+            //plot_pixel(x,y,tempFrame[x+y*SCREENX]);
+            plot_pixel(x,y, tempFrame[x+y*SCREENX]);
+        }
+    }
+}
+
+void drawShadow(){
+	//skylight/ plane of light going straight down
+    float lightDistance = 400;
+    int radiusProjection = (float)gameBall.radius/(lightDistance-gameBall.centre[1])*(lightDistance-GROUND_Y);
+    
+    
+    int x = radiusProjection;
+    int y = 0;
+    int xChange = 1 - (radiusProjection << 1);
+    int yChange = 0;
+    int radiusError = 0;
+    float shadowPoint[3] = {gameBall.centre[0],GROUND_Y,gameBall.centre[2]};
+    short int drawPoint[2];
+    projectPixel(0,shadowPoint,origin, &(ballShadow.pastCentre[0]),&(ballShadow.pastCentre[1]));
+    //ballShadow.pastRadiusScreen = -radiusProjection/(gameBall.centre[2])*SCREENX;
+
+    while (x >= y)
+    {
+        for (int i = gameBall.centre[0] - x; i <= gameBall.centre[0] + x; i++)
+        {
+            shadowPoint[0] = i;
+            shadowPoint[2] = gameBall.centre[2]+y;
+            if(shadowPoint[2]>OPPONENT_LOC_Z&&shadowPoint[2]<PLAYER_LOC_Z){
+                projectPixel(0,shadowPoint, origin, &(drawPoint[0]), &(drawPoint[1]));
+                plot_pixel(drawPoint[0], drawPoint[1], 0);
+            }
+
+            shadowPoint[2] = gameBall.centre[2]-y;
+            if(shadowPoint[2]>OPPONENT_LOC_Z&&shadowPoint[2]<PLAYER_LOC_Z){
+                projectPixel(0,shadowPoint, origin, &(drawPoint[0]), &(drawPoint[1]));
+                plot_pixel(drawPoint[0], drawPoint[1], 0);
+            }
+        }
+        for (int i = gameBall.centre[0] - y; i <= gameBall.centre[0] + y; i++)
+        {
+            shadowPoint[0] = i;
+            shadowPoint[2] = gameBall.centre[2] +x;
+            if(shadowPoint[2]>OPPONENT_LOC_Z&&shadowPoint[2]<PLAYER_LOC_Z){
+                projectPixel(0,shadowPoint, origin, &(drawPoint[0]), &(drawPoint[1]));
+                plot_pixel(drawPoint[0], drawPoint[1], 0);
+            }
+            shadowPoint[2] = gameBall.centre[2] -x;
+            if(shadowPoint[2]>OPPONENT_LOC_Z&&shadowPoint[2]<PLAYER_LOC_Z){
+                projectPixel(0,shadowPoint, origin, &(drawPoint[0]), &(drawPoint[1]));
+                plot_pixel(drawPoint[0], drawPoint[1], 0);
+            }
+        }
+
+        y++;
+        radiusError += yChange;
+        yChange += 2;
+        if (((radiusError << 1) + xChange) > 0)
+        {
+            x--;
+            radiusError += xChange;
+            xChange += 2;
+        }
+    }
+    
+}
 
 void saveFrame(){
 	short int *one_pixel_address;
@@ -271,6 +344,8 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 
 void updateFrame(){
 	eraseSimpleBall();
+	eraseShadow();
+    drawShadow();
 	simpleDrawBall(origin); 
 	updateLocation();
 	wait_for_vsync(); // swap front and back buffers on VGA vertical sync
