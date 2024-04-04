@@ -5,37 +5,38 @@
 
 int flagLeft = 0;
 int flagRight = 0;
+int flagReset = 0;
 bool gameover = true;
+
+volatile int *PS2_ptr = (int *)PS2_BASE;
+int PS2_data, RVALID;
+char byte1 = 0, byte2 = 0, byte3 = 0;
 
 void HEX_PS2(char, char, char);
 
+
 // int main(void) { // for debugging the PS2 driver
-//     PS_2INPUT();
+//     *(PS2_ptr) = 0xFF;
+//     while(1){
+//         PS_2INPUT();
+//     }
 //     return 0;
 // }
 
 void PS_2INPUT(){
-    volatile int *PS2_ptr = (int *)PS2_BASE;
-    int PS2_data, RVALID;
-    char byte1 = 0, byte2 = 0, byte3 = 0;
-
-    *(PS2_ptr) = 0xFF;
-    while (1) {
-        PS2_data = *(PS2_ptr);
-        RVALID = PS2_data &
-                0x8000;  // checks bit 15 to see if RVALID has loaded anything in
-        if (RVALID) {     // if RVALID has loaded something in
+    PS2_data = *(PS2_ptr);
+    RVALID = PS2_data & 0x8000;  // checks bit 15 to see if RVALID has loaded anything in
+    if (RVALID) {     // if RVALID has loaded something in
         byte1 = byte2;
         byte2 = byte3;
         byte3 = PS2_data & 0xFF;
         // HEX_PS2(byte1, byte2, byte3);
         flagRaiseCheck(byte1, byte2, byte3); // raises the global variable flags, poll for this during the timing of when the player is prompted to hit
-        // LED_PS2(flagLeft, flagRight); // just checks if the flag system is working
+        LED_PS2(flagLeft, flagRight); // just checks if the flag system is working
 
-        if ((byte2 == (char)0xAA) &&
-            (byte3 == (char)0x00))  // 10101010 and 00000000
-            *(PS2_ptr) = 0xF4;        // 11111000
-        }
+        // if ((byte2 == (char)0xAA) && (byte3 == (char)0x00)){  // 10101010 and 00000000
+        //     *(PS2_ptr) = 0xF4;        // 11111000
+        // }
     }
 }
 
@@ -116,6 +117,9 @@ void flagRaiseCheck(char b1, char b2, char b3) {
     } else if (b1 == 0x1B){
         flagLeft = 0;
         flagRight = 0;
+        flagReset = 0;
+    } else if (b1 == 0x2D){
+        flagReset = 1;
     }
 }
 
