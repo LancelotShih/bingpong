@@ -1,4 +1,61 @@
+/*******************************************************************************
+ * This file provides address values that exist in the DE1-SoC Computer
+ ******************************************************************************/
 
+#ifndef __SYSTEM_INFO__
+#define __SYSTEM_INFO__
+
+#define BOARD				"DE1-SoC"
+
+/* Memory */
+#define DDR_BASE                0x40000000
+#define DDR_END                 0x7FFFFFFF
+#define A9_ONCHIP_BASE          0xFFFF0000
+#define A9_ONCHIP_END           0xFFFFFFFF
+#define SDRAM_BASE              0x00000000
+#define SDRAM_END               0x03FFFFFF
+#define FPGA_PIXEL_BUF_BASE     0x08000000
+#define FPGA_PIXEL_BUF_END      0x0803FFFF
+#define FPGA_CHAR_BASE          0x09000000
+#define FPGA_CHAR_END           0x09001FFF
+
+/* Cyclone V FPGA devices */
+#define LED_BASE                0xFF200000
+#define LEDR_BASE               0xFF200000
+#define HEX3_HEX0_BASE          0xFF200020
+#define HEX5_HEX4_BASE          0xFF200030
+#define SW_BASE                 0xFF200040
+#define KEY_BASE                0xFF200050
+#define JP1_BASE                0xFF200060
+#define JP2_BASE                0xFF200070
+#define PS2_BASE                0xFF200100
+#define PS2_DUAL_BASE           0xFF200108
+#define JTAG_UART_BASE          0xFF201000
+#define IrDA_BASE               0xFF201020
+#define TIMER_BASE              0xFF202000
+#define TIMER_2_BASE            0xFF202020
+#define AV_CONFIG_BASE          0xFF203000
+#define RGB_RESAMPLER_BASE      0xFF203010
+#define PIXEL_BUF_CTRL_BASE     0xFF203020
+#define CHAR_BUF_CTRL_BASE	    0xFF203030
+#define AUDIO_BASE			    0xFF203040
+#define VIDEO_IN_BASE		    0xFF203060
+#define EDGE_DETECT_CTRL_BASE   0xFF203070
+#define ADC_BASE			    0xFF204000
+
+/* Cyclone V HPS devices */
+#define HPS_GPIO1_BASE          0xFF709000
+#define I2C0_BASE               0xFFC04000
+#define I2C1_BASE               0xFFC05000
+#define I2C2_BASE               0xFFC06000
+#define I2C3_BASE               0xFFC07000
+#define HPS_TIMER0_BASE         0xFFC08000
+#define HPS_TIMER1_BASE         0xFFC09000
+#define HPS_TIMER2_BASE         0xFFD00000
+#define HPS_TIMER3_BASE         0xFFD01000
+#define FPGA_BRIDGE             0xFFD0501C
+
+#endif
 
 // array size is 153600
 static const short pingpong[] = {
@@ -243,7 +300,7 @@ static const short pingpong[] = {
   6536, 6536, 6536, 6536, 6536, 6536, 6536, 6536, 8617, 8617, 8616, 6536, 6536, 6536, 6536, 6568, 6569, 8617, 8617, 8617, 8617, 8617, 8649, 8649, 8649, 8649, 6569, 6569, 8649, 8714, 6601, 8649, 8649, 8650, 8650, 8650, 8682, 8714, 8714, 8714, 10762, 10795, 10795, 10795, 12875, 12875, 12875, 12875, 12908, 14956, 14988, 14988, 15020, 14988, 15020, 15020, 17068, 15021, 15021, 17069, 17069, 17101, 17101, 17101, 17102, 17101, 17133, 17133, 17133, 17133, 17134, 17134, 17166, 17134, 17134, 19214, 19214, 19214, 19214, 19214, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 17167, 17134, 17134, 17102, 15054, 17102, 17102, 17134, 17166, 19247, 19247, 19247, 21327, 21327, 21328, 21360, 21360, 21360, 21360, 21360, 21360, 23440, 23440, 23472, 23473, 23473, 23473, 25521, 25553, 25521, 25521, 25553, 25553, 25586, 25585, 25585, 25585, 27633, 27633, 27633, 27634, 27666, 27634, 25585, 25585, 25553, 25553, 23473, 23441, 23441, 21328, 19280, 19248, 19248, 19247, 19280, 21328, 21328, 23408, 23440, 23441, 23473, 23473, 23441, 23408, 23408, 21328, 21327, 19247, 17134, 17101, 15021, 12908, 19182, 54939, 8649, 10763, 14956, 14989, 19182, 19215, 19247, 21295, 21327, 21328, 23408, 23408, 21360, 21360, 23408, 23408, 21328, 21327, 21360, 21328, 19247, 17167, 17134, 17134, 17134, 17134, 17134, 19215, 19247, 19247, 19247, 19247, 21327, 21327, 21295, 21295, 21327, 21295, 21327, 21328, 21327, 21295, 19247, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19215, 19247, 21327, 21295, 19215, 19215, 19214, 19182, 19182, 19182, 19182, 19182, 17134, 17134, 17134, 17102, 17102, 15021, 15021, 15021, 15021, 15021, 15021, 17069, 17101, 17102, 17134, 19182, 19182, 19182, 19182, 19182, 17101, 19182, 19182, 19182, 19182, 19182, 19181, 19149, 19149, 19149, 19182, 19181, 19182, 19182, 19182, 19181, 19181, 19181, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 19149, 17069, 17068, 17036, 17036, 14988, 14956, 12875, 12875, 12875, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12811, 10762, 10762, 10762, 12810, 10730, 10762, 10762, 10762, 10730, 10730, 10729, 10730, 10729, 10729, 10697, 8649, 8649, 10697, 8649, 10697, 10697, 
   6536, 6536, 6536, 6536, 6536, 6536, 6536, 6503, 8617, 8617, 8616, 6536, 6536, 6536, 6536, 6568, 8617, 8617, 8617, 8649, 8649, 8617, 8649, 8649, 8649, 8649, 6569, 6569, 6601, 8714, 6569, 6601, 6601, 8649, 8650, 8650, 8682, 8682, 8714, 8714, 10763, 10763, 10795, 10795, 12875, 12875, 12875, 12875, 12908, 14956, 14988, 14988, 15020, 15020, 17068, 15020, 17068, 17069, 17069, 17101, 17101, 17101, 17101, 17134, 19182, 17134, 17134, 17134, 17134, 17134, 17134, 17134, 17166, 19214, 19214, 19214, 19214, 19214, 19214, 19215, 19247, 19215, 19215, 19215, 19215, 19215, 19247, 19215, 19215, 19215, 19215, 17134, 17134, 17134, 17102, 17102, 17102, 17134, 17166, 19247, 19247, 21327, 21327, 21328, 21328, 21360, 21360, 21360, 21360, 23440, 23440, 23473, 23473, 25553, 25553, 23473, 25521, 25553, 25553, 25553, 25553, 25553, 25585, 27634, 27634, 25585, 25585, 27633, 27633, 27633, 27634, 27666, 27666, 27634, 25585, 25585, 25585, 25553, 23473, 23441, 21328, 19280, 19248, 19248, 19247, 19279, 21360, 21360, 23441, 23441, 23473, 23473, 25521, 23440, 23440, 23440, 21360, 21328, 21327, 19215, 17134, 17101, 14988, 21262, 57019, 10697, 10764, 14957, 17102, 19182, 21263, 19247, 21295, 21328, 21360, 21328, 23408, 23408, 21360, 23408, 23440, 21360, 21327, 21360, 19279, 19247, 17166, 17134, 17134, 17134, 17134, 17134, 19215, 19247, 19247, 19247, 21295, 21295, 21328, 21295, 21295, 21295, 21295, 21327, 21327, 21328, 21327, 19247, 19215, 19215, 19215, 19183, 19214, 19214, 19215, 19215, 19215, 19214, 19215, 21295, 19247, 19247, 19214, 19182, 19182, 19182, 17134, 17134, 17134, 17134, 17134, 17102, 17102, 15021, 15021, 15021, 15021, 15021, 15021, 17069, 17101, 17102, 19182, 19182, 19182, 19182, 19182, 19214, 19214, 19182, 19182, 19182, 19182, 19182, 19182, 19181, 19149, 19149, 19182, 19181, 19181, 19181, 19181, 19181, 19181, 19149, 19149, 19181, 19149, 19149, 19149, 19149, 19181, 19149, 19149, 19149, 19149, 19149, 19149, 17069, 17068, 17036, 17036, 14988, 14956, 14923, 12875, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12811, 12811, 12811, 10762, 10762, 10762, 10762, 10730, 10762, 10762, 10730, 10730, 10729, 10729, 10729, 10729, 10729, 8649, 8649, 8649, 10697, 8649, 8649, 10697
 };
-#include <address_map_nios2.h>
+
 #include <stdlib.h> 
 #include <stdbool.h>
 #include <stdio.h>
@@ -976,4 +1033,278 @@ void video_text(int x, int y, char * text_ptr) {
         ++text_ptr;
         ++offset; 
     }
+}
+
+
+#include "stdbool.h"
+#include "stdio.h"
+
+
+int flagLeft = 0;
+int flagRight = 0;
+int flagReset = 0;
+bool gameover = true;
+
+volatile int *PS2_ptr = (int *)PS2_BASE;
+int PS2_data, RVALID;
+char byte1 = 0, byte2 = 0, byte3 = 0;
+
+void HEX_PS2(char, char, char);
+
+
+// int main(void) { // for debugging the PS2 driver
+//     *(PS2_ptr) = 0xFF;
+//     while(1){
+//         PS_2INPUT();
+//     }
+//     return 0;
+// }
+
+void PS_2INPUT(){
+    PS2_data = *(PS2_ptr);
+    RVALID = PS2_data & 0x8000;  // checks bit 15 to see if RVALID has loaded anything in
+    if (RVALID) {     // if RVALID has loaded something in
+        byte1 = byte2;
+        byte2 = byte3;
+        byte3 = PS2_data & 0xFF;
+        // HEX_PS2(byte1, byte2, byte3);
+        flagRaiseCheck(byte1, byte2, byte3); // raises the global variable flags, poll for this during the timing of when the player is prompted to hit
+        LED_PS2(flagLeft, flagRight); // just checks if the flag system is working
+
+        // if ((byte2 == (char)0xAA) && (byte3 == (char)0x00)){  // 10101010 and 00000000
+        //     *(PS2_ptr) = 0xF4;        // 11111000
+        // }
+    }
+}
+
+void PS_2STARTGAME(){
+    volatile int *PS2_ptr = (int *)PS2_BASE;
+    int PS2_data, RVALID;
+    char byte1 = 0, byte2 = 0, byte3 = 0;
+
+    *(PS2_ptr) = 0xFF;
+
+    while(1){
+        PS2_data = *(PS2_ptr);
+        RVALID = PS2_data & 0x8000;
+        if (RVALID) {
+            byte1 = byte2;
+            byte2 = byte3;
+            byte3 = PS2_data & 0xFF;
+            
+        if (byte1 == 0x34){
+            gameover = !gameover;
+        }
+
+        if ((byte2 == (char)0xAA) &&
+            (byte3 == (char)0x00))  // 10101010 and 00000000
+            *(PS2_ptr) = 0xF4;        // 11111000
+        }
+        
+
+    }
+
+}
+
+void HEX_PS2(char b1, char b2, char b3) {
+  volatile int *HEX3_HEX0_ptr = (int *)HEX3_HEX0_BASE;
+  volatile int *HEX5_HEX4_ptr = (int *)HEX5_HEX4_BASE;
+
+  unsigned char seven_seg_decode_table[] = {
+      0x3F,  // 0
+      0x06,  // 1
+      0x5B,  // 2
+      0x4F,  // 3
+      0x66,  // 4
+      0x6D,  // 5
+      0x7D,  // 6
+      0x07,  // 7
+      0x7F,  // 8
+      0x6F,  // 9
+      0x77,  // A
+      0x7C,  // b
+      0x39,  // C
+      0x5E,  // d
+      0x79,  // E
+      0x71   // F
+  };
+
+  unsigned char hex_segs[] = {0, 0, 0, 0, 0, 0, 0, 0};
+  unsigned int shift_buffer, nibble;
+  unsigned char code;
+  int i;
+
+  shift_buffer = (b1 << 16) | (b2 << 8) | b3;
+  for (i = 0; i < 6; ++i) {
+    nibble = shift_buffer & 0x0000000F;  // character is in rightmost nibble
+    code = seven_seg_decode_table[nibble];
+    hex_segs[i] = code;
+    shift_buffer = shift_buffer >> 4;
+  }
+
+  *(HEX3_HEX0_ptr) = *(int *)(hex_segs);
+  *(HEX5_HEX4_ptr) = *(int *)(hex_segs + 4);
+}
+
+void flagRaiseCheck(char b1, char b2, char b3) {
+    if (b1 == 0x1C) {
+        flagLeft = 1;  // raised if the left key was pressed
+    } else if (b1 == 0x23) {
+        flagRight = 1;  // raised if the right key was pressed
+    } else if (b1 == 0x1B){
+        flagLeft = 0;
+        flagRight = 0;
+        flagReset = 0;
+    } else if (b1 == 0x2D){
+        flagReset = 1;
+    }
+}
+
+void LED_PS2(int flagLeft, int flagRight) {
+    volatile int *LEDR_ptr = (int *)LED_BASE;
+    int ledValue = *LEDR_ptr;
+    if (flagLeft == 1 && ledValue == 0x0) { // needs to be fresh and flag is left
+        printf("left flag raised \n");
+        ledValue = 0x2;  // turns on the left LED
+    }
+    if (flagRight == 1 && ledValue == 0x0) { // needs to be fresh and flag is right
+        printf("right flag raised \n");
+        ledValue = 0x1;  // turns on the right LED
+    } 
+    if (flagLeft == 0 && flagRight == 0) {
+        ledValue = 0x0;  // turns off all LEDs
+    }
+    *LEDR_ptr = ledValue;
+}
+
+
+#include "stdbool.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "unistd.h"
+
+
+
+/* GLOBAL VARIABLES */
+
+int score = 0;                // changed by game
+int difficulty = 3;
+int winScore;
+int turnTracker = 0;  // 0 is Player, 1 is CPU
+int defaultTime;
+int speedupMultiplier = 0.95;
+
+int currPos = 1; // use these as conditionals for selecting which if statement to use
+int nextPos = 2;
+int prevPos = 1;
+
+void gameLoop();
+void updateHitTime();
+int CPUhitter();
+
+int main() {
+    startGraphics();
+    initilizePlane();
+    drawImgBackground(pingpong);
+    drawPlane();
+    saveFrame();
+
+    while(1){
+
+        gameLoop();
+        score = 0;
+    }
+}
+
+void gameLoop(){
+    hitTime = 50;
+    scaleGravity(hitTime-3);
+    setUpGame(1, hitTime);
+    *(PS2_ptr) = 0xFF;
+    currPos = 2;
+    nextPos = 0; // default player's first hit will always be to the left
+    float netLocation = (OPPONENT_LOC_Z - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -685
+    float netToPlayerLocation = (netLocation - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -478
+
+    while(1){
+		updateFrame();
+        if(gameBall.centre[2] > netLocation){
+            // only allows an input when the ball is past the net
+            PS_2INPUT();
+        }
+        // main game logic
+        if (currPos == 0 || currPos == 1){
+            // cpu turn
+            flagLeft = 0;
+            flagRight = 0;
+            if(gameBall.centre[2] < OPPONENT_LOC_Z){
+                printf("current position: %d\n", currPos);
+                nextPos = CPUhitter();
+                bounceBall(hitTime, currPos, nextPos);
+                currPos = nextPos;
+            }
+        } else if (currPos == 2 || currPos == 3){
+            // player turn
+
+            bool hitPositive = false;
+            // hit it from it's current position to the desired next position
+            if((flagLeft == 1 && flagRight == 0 && currPos == 2) || (flagLeft == 0 && flagRight == 1 && currPos == 3)){
+                printf("Flag left: %d\n", flagLeft);
+                printf("Flag right: %d\n", flagRight);
+                printf("current position: %d\n", currPos);
+                // check whether to hit it left or right next
+                if((gameBall.centre[2] > netLocation) && (gameBall.centre[2] < netToPlayerLocation)){
+                    // between net and center of player side's table
+                    nextPos = 0;
+                } else if ((gameBall.centre[2] > netToPlayerLocation) && (gameBall.centre[2] > PLAYER_LOC_Z)){
+                    // between center of player side's table and player
+                    nextPos = 1;
+                }
+
+                bounceBall(hitTime, currPos, nextPos);
+                currPos = nextPos; 
+                
+                // misc cleanup per hit
+                score++;
+                wipeScore(1,1,11);
+                updateScoreScreen(score);
+                updateHitTime();
+
+                // lower the flags after bouncing the ball
+                flagLeft = 0;
+                flagRight = 0;
+                printf("Flag lowered \n");
+            }
+
+        }
+
+        
+
+        bool zboundcheck = (gameBall.centre[2] > (PLAYER_LOC_Z + 100))   || (gameBall.centre[2] < (OPPONENT_LOC_Z - 100));
+        bool xboundcheck = (gameBall.centre[0] < (PLAYER_LOC_Z/2 - 50))  || (gameBall.centre[0] > (-PLAYER_LOC_Z/2 + 50));
+        bool yboundcheck = (gameBall.centre[1] > 200 || (gameBall.centre[1] < (GROUND_Y-150))) ;
+        
+        if(zboundcheck || xboundcheck || yboundcheck){
+            drawImgBackground(tempFrame);
+            break;
+        }
+        
+    }
+
+
+
+}
+
+void updateHitTime(){
+    if(hitTime > 5){
+        hitTime = hitTime - 3;
+        scaleGravity(hitTime);
+    }
+}
+
+int CPUhitter(){
+    double randNum = (double)rand() / RAND_MAX;
+
+    int CPUhitLocation = (int)randNum + 2;
+    return CPUhitLocation;
 }

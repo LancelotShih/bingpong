@@ -1,0 +1,150 @@
+#include "PS2.h"
+#include "stdbool.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "unistd.h"
+#include "time.h"
+#include "graphics.h"
+
+
+/* GLOBAL VARIABLES */
+
+int score = 0;                // changed by game
+int difficulty = 3;
+int winScore;
+int turnTracker = 0;  // 0 is Player, 1 is CPU
+int defaultTime;
+int speedupMultiplier = 0.95;
+
+int currPos = 1; // use these as conditionals for selecting which if statement to use
+int nextPos = 2;
+int prevPos = 1;
+
+void gameLoop();
+int CPUhitter();
+
+int main() {
+    startGraphics();
+    initilizePlane();
+    drawImgBackground(pingpong);
+    drawPlane();
+    saveFrame();
+    while(1){
+
+        gameLoop();
+        score = 0;
+    }
+}
+
+// separate gameloop allows for an easy reset conditional
+void gameLoop(){
+    hitTime = 50;
+    scaleGravity(hitTime-3);
+    setUpGame(1, hitTime);
+    // printf("entered loop \n");
+    *(PS2_ptr) = 0xFF;
+    int printer = 0;
+    float netLocation = (OPPONENT_LOC_Z - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -685
+    float netToPlayerLocation = (netLocation - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -478
+    currPos = 2;
+    nextPos = 0; // default player's first hit will always be to the left
+    bool hitPositive = false;
+    while(1){
+		updateFrame();
+        PS_2INPUT();
+        if(flagLeft == 1){
+            if(gameBall.centre[2] > PLAYER_LOC_Z && currPos = 2){
+                bounceBall(hitTime, 2, nextPos);
+                score++;
+                wipeScore(1, 1, 11);
+                updateScoreScreen(score);
+                if(hitTime > 5){
+                    hitTime = hitTime - 3;
+                    scaleGravity(hitTime);
+                } 
+                hitPositive = true;
+                // printf("######## BALL FINISHED BOUNCING ####### \n");
+            } 
+        } else if (flagRight == 1){
+            if(gameBall.centre[2] > PLAYER_LOC_Z && currPos = 3){
+                // nextPos = 1;
+                bounceBall(hitTime, 3, nextPos);
+                score++;
+                wipeScore(1, 1, 11);
+                updateScoreScreen(score);
+                if(hitTime > 5){
+                    hitTime = hitTime - 3;
+                    scaleGravity(hitTime);
+                }
+                hitPositive = true;
+            } 
+        } else if (gameBall.centre[2] < OPPONENT_LOC_Z){
+            int CPUhitLocation = CPUhitter();
+            // printf("%d", CPUhitLocation);
+            bounceBall(hitTime, currPos, CPUhitLocation);
+            currPos = CPUhitLocation;
+        }
+
+
+        // if(flagLeft == 1 && gameBall.centre[2] > PLAYER_LOC_Z){
+        //     bounceBall(hitTime, 2, 0);
+        //     if(hitTime > 5){
+        //         hitTime = hitTime - 3;
+        //         scaleGravity(hitTime);
+        //     }
+        // } else if (flagRight == 1 && gameBall.centre[2] > PLAYER_LOC_Z){
+        //     bounceBall(hitTime, 3, 0);
+        //     if(hitTime > 5){
+        //         hitTime = hitTime - 3;
+        //         scaleGravity(hitTime);
+        //     }
+        // } else if (gameBall.centre[2] < OPPONENT_LOC_Z){
+        //     int CPUhitLocation =  CPUhitter();
+        //     bounceBall(hitTime, 0, CPUhitLocation);
+        // }
+        if(gameBall.centre[2] < netLocation){
+            // disable changes to left and right flags
+            // printf("no changes made \n");
+        } else if ((gameBall.centre[2] > netLocation) && (gameBall.centre[2] < netToPlayerLocation) && hitPositive){ // follows center compared to far, center compared to close
+            // printf("nextpos is 0 \n");
+            flagLeft = 0;
+            flagRight = 0;
+            nextPos = 0;
+        } else if ((gameBall.centre[2] > netToPlayerLocation) && (gameBall.centre[2] > PLAYER_LOC_Z) && hitPositive){ 
+            // printf("nextpos is 1 \n");
+            flagLeft = 0;
+            flagRight = 0;
+            nextPos = 1;
+        }
+        // nextPos will not be realized unless the ball is hit properly
+
+
+        bool zboundcheck = (gameBall.centre[2] > (PLAYER_LOC_Z + 100))   || (gameBall.centre[2] < (OPPONENT_LOC_Z - 100));
+        bool xboundcheck = (gameBall.centre[0] < (PLAYER_LOC_Z/2 - 50))  || (gameBall.centre[0] > (-PLAYER_LOC_Z/2 + 50));
+        bool yboundcheck = (gameBall.centre[1] > 200 || (gameBall.centre[1] < (GROUND_Y-150))) ;
+        
+        if(zboundcheck || xboundcheck || yboundcheck){
+            // printf("reset coords\n");
+            // printf("x location: %f \n", gameBall.centre[0]);
+            // printf("y location: %f \n", gameBall.centre[1]);
+            // printf("z location: %f \n", gameBall.centre[2]);
+            // printf("resetting! \n");
+            drawImgBackground(tempFrame);
+            break;
+        }
+        // printer++;
+        // if(printer == 5){    
+        //     printf("yloc always: %f \n", gameBall.centre[1]);
+        //     printer = 0;
+        // }
+        
+    }
+    return;
+}
+
+int CPUhitter(){
+    double randNum = (double)rand() / RAND_MAX;
+
+    int CPUhitLocation = (int)randNum + 2;
+    return CPUhitLocation;
+}

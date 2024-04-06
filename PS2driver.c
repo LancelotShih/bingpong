@@ -127,9 +127,11 @@ void LED_PS2(int flagLeft, int flagRight) {
     volatile int *LEDR_ptr = (int *)LED_BASE;
     int ledValue = *LEDR_ptr;
     if (flagLeft == 1 && ledValue == 0x0) { // needs to be fresh and flag is left
+        printf("left flag raised \n");
         ledValue = 0x2;  // turns on the left LED
     }
     if (flagRight == 1 && ledValue == 0x0) { // needs to be fresh and flag is right
+        printf("right flag raised \n");
         ledValue = 0x1;  // turns on the right LED
     } 
     if (flagLeft == 0 && flagRight == 0) {
