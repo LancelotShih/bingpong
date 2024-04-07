@@ -262,6 +262,8 @@ extern struct shadow ballShadow;
 extern volatile int * pixel_ctrl_ptr;
 extern const short int heightBall;
 extern int hitTime;
+extern int playerSpriteSide;
+
 
 struct plane{
 	int length;
@@ -323,5 +325,6 @@ void saveFrame();
 void scaleGravity(int hitTime);
 void drawShadow();
 void eraseShadow();
+void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
 
 #endif
