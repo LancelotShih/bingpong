@@ -771,6 +771,12 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 	//printf("BOUNCEscreen x %d, sceen y %d \n", gameBall.pastScreenLoc[0],  gameBall.pastScreenLoc[1]);
 	//wait_for_vsync();
 	//pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+    if(startPosition ==2){
+		playerSpriteSide =2;
+	}
+	else if(startPosition ==3){
+		playerSpriteSide =3;
+	}
 	
 }
 
