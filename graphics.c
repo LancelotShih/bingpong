@@ -1303,7 +1303,7 @@ void updateFrame(){
 	eraseSimpleBall();
     eraseShadow();
     if(opponentSprite == 0){
-        eraseSprite(30, 22, table.point2[0]-10 , table.point1[1]-20, smallPaddle);
+        eraseSprite(30, 22, table.point2[0]-30 , table.point1[1]-20, smallPaddle);
         drawSprite(30, 22, table.point1[0]+10 , table.point1[1]-20, smallPaddle);
     }
     else if(opponentSprite ==1){

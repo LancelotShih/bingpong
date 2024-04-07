@@ -890,6 +890,7 @@ void scaleGravity(int hitTime);
 void drawShadow();
 void eraseShadow();
 void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
+void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
 void startScreen();
 void endScreen();
 
