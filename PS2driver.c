@@ -30,14 +30,20 @@ void PS_2INPUT(){
         byte1 = byte2;
         byte2 = byte3;
         byte3 = PS2_data & 0xFF;
-        // HEX_PS2(byte1, byte2, byte3);
+        HEX_PS2(byte1, byte2, byte3);
         flagRaiseCheck(byte1, byte2, byte3); // raises the global variable flags, poll for this during the timing of when the player is prompted to hit
         LED_PS2(flagLeft, flagRight); // just checks if the flag system is working
-
+        // bufferReset();
         // if ((byte2 == (char)0xAA) && (byte3 == (char)0x00)){  // 10101010 and 00000000
         //     *(PS2_ptr) = 0xF4;        // 11111000
         // }
     }
+}
+
+void bufferReset(){
+    byte1 = 0xFF;
+    byte2 = 0xFF;
+    byte3 = 0xFF;
 }
 
 void PS_2STARTGAME(){
@@ -110,15 +116,15 @@ void HEX_PS2(char b1, char b2, char b3) {
 }
 
 void flagRaiseCheck(char b1, char b2, char b3) {
-    if (b1 == 0x1C) {
+    if (b1 == 0x1C && b2 != 0xF0) {
         flagLeft = 1;  // raised if the left key was pressed
-    } else if (b1 == 0x23) {
+    } else if (b1 == 0x23 && b2 != 0xF0) {
         flagRight = 1;  // raised if the right key was pressed
-    } else if (b1 == 0x1B){
+    } else if (b1 == 0x1B && b2 != 0xF0){
         flagLeft = 0;
         flagRight = 0;
         flagReset = 0;
-    } else if (b1 == 0x2D){
+    } else if (b1 == 0x2D && b2 != 0xF0){
         flagReset = 1;
     }
 }
@@ -126,11 +132,11 @@ void flagRaiseCheck(char b1, char b2, char b3) {
 void LED_PS2(int flagLeft, int flagRight) {
     volatile int *LEDR_ptr = (int *)LED_BASE;
     int ledValue = *LEDR_ptr;
-    if (flagLeft == 1 && ledValue == 0x0) { // needs to be fresh and flag is left
+    if (flagLeft == 1 && flagRight == 0 && ledValue == 0x00) { // needs to be fresh and flag is left
         printf("left flag raised \n");
         ledValue = 0x2;  // turns on the left LED
     }
-    if (flagRight == 1 && ledValue == 0x0) { // needs to be fresh and flag is right
+    if (flagRight == 1 && flagLeft == 0 && ledValue == 0x00) { // needs to be fresh and flag is right
         printf("right flag raised \n");
         ledValue = 0x1;  // turns on the right LED
     } 

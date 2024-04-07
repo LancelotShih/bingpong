@@ -301,6 +301,8 @@ static const short pingpong[] = {
   6536, 6536, 6536, 6536, 6536, 6536, 6536, 6503, 8617, 8617, 8616, 6536, 6536, 6536, 6536, 6568, 8617, 8617, 8617, 8649, 8649, 8617, 8649, 8649, 8649, 8649, 6569, 6569, 6601, 8714, 6569, 6601, 6601, 8649, 8650, 8650, 8682, 8682, 8714, 8714, 10763, 10763, 10795, 10795, 12875, 12875, 12875, 12875, 12908, 14956, 14988, 14988, 15020, 15020, 17068, 15020, 17068, 17069, 17069, 17101, 17101, 17101, 17101, 17134, 19182, 17134, 17134, 17134, 17134, 17134, 17134, 17134, 17166, 19214, 19214, 19214, 19214, 19214, 19214, 19215, 19247, 19215, 19215, 19215, 19215, 19215, 19247, 19215, 19215, 19215, 19215, 17134, 17134, 17134, 17102, 17102, 17102, 17134, 17166, 19247, 19247, 21327, 21327, 21328, 21328, 21360, 21360, 21360, 21360, 23440, 23440, 23473, 23473, 25553, 25553, 23473, 25521, 25553, 25553, 25553, 25553, 25553, 25585, 27634, 27634, 25585, 25585, 27633, 27633, 27633, 27634, 27666, 27666, 27634, 25585, 25585, 25585, 25553, 23473, 23441, 21328, 19280, 19248, 19248, 19247, 19279, 21360, 21360, 23441, 23441, 23473, 23473, 25521, 23440, 23440, 23440, 21360, 21328, 21327, 19215, 17134, 17101, 14988, 21262, 57019, 10697, 10764, 14957, 17102, 19182, 21263, 19247, 21295, 21328, 21360, 21328, 23408, 23408, 21360, 23408, 23440, 21360, 21327, 21360, 19279, 19247, 17166, 17134, 17134, 17134, 17134, 17134, 19215, 19247, 19247, 19247, 21295, 21295, 21328, 21295, 21295, 21295, 21295, 21327, 21327, 21328, 21327, 19247, 19215, 19215, 19215, 19183, 19214, 19214, 19215, 19215, 19215, 19214, 19215, 21295, 19247, 19247, 19214, 19182, 19182, 19182, 17134, 17134, 17134, 17134, 17134, 17102, 17102, 15021, 15021, 15021, 15021, 15021, 15021, 17069, 17101, 17102, 19182, 19182, 19182, 19182, 19182, 19214, 19214, 19182, 19182, 19182, 19182, 19182, 19182, 19181, 19149, 19149, 19182, 19181, 19181, 19181, 19181, 19181, 19181, 19149, 19149, 19181, 19149, 19149, 19149, 19149, 19181, 19149, 19149, 19149, 19149, 19149, 19149, 17069, 17068, 17036, 17036, 14988, 14956, 14923, 12875, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12843, 12811, 12811, 12811, 10762, 10762, 10762, 10762, 10730, 10762, 10762, 10730, 10730, 10729, 10729, 10729, 10729, 10729, 8649, 8649, 8649, 10697, 8649, 8649, 10697
 };
 
+// ==================================================== GRAPHICS.C ================================================
+
 #include <stdlib.h> 
 #include <stdbool.h>
 #include <stdio.h>
@@ -640,16 +642,16 @@ void scaleGravity(int hitTime){
     // GRAVITY = exp(exponent) + 0.2;
     // GRAVITY = 1;
 
-    float exponent = -0.125*(hitTime - 13);
-    GRAVITY = 23.9*(exp(exponent)) + 0.5;
-    if(hitTime < 15){
-        // cap gravity at 12
-        GRAVITY = 12;
-    }
-
-    // if (GRAVITY > 0){
-    // GRAVITY = -7*atan((1/9.0)*hitTime - 2.1) + 10;
+    // float exponent = -0.125*(hitTime - 13);
+    // GRAVITY = 23.9*(exp(exponent)) + 0.5;
+    // if(hitTime < 15){
+    //     // cap gravity at 12
+    //     GRAVITY = 12;
     // }
+
+    if (GRAVITY > 0){
+        GRAVITY = -5.2*atan((1/5.2)*hitTime - 3.6) + 8.3;
+    }
 }
 
 void startGraphics()
@@ -734,10 +736,10 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 
 void updateFrame(){
 	eraseSimpleBall();
-    // eraseShadow();
+    eraseShadow();
     
     updateLocation();
-    // drawShadow();
+    drawShadow();
     if(gameBall.screenLoc[0]<0||gameBall.screenLoc[0]>=SCREENX||gameBall.screenLoc[1]<0||gameBall.screenLoc[1]>SCREENY){
         // printf("ball out of screen! first pass\n");
         return;
@@ -1010,7 +1012,7 @@ void wipeScore(int x, int y, int size){
 void updateScoreScreen(int score){
     char text_ptr[11] = {'s','c','o','r','e',' ', '\0 ' };
     char number[3];
-    sprintf(number, "%d", score);
+    // sprintf(number, "%d", score);
     // printf(number);
     for (int index = 0; ; index++){
         text_ptr[6+index] = number[index];
@@ -1034,6 +1036,10 @@ void video_text(int x, int y, char * text_ptr) {
         ++offset; 
     }
 }
+
+
+// ==================================================== PS2.C ================================================
+
 
 
 #include "stdbool.h"
@@ -1067,14 +1073,20 @@ void PS_2INPUT(){
         byte1 = byte2;
         byte2 = byte3;
         byte3 = PS2_data & 0xFF;
-        // HEX_PS2(byte1, byte2, byte3);
+        HEX_PS2(byte1, byte2, byte3);
         flagRaiseCheck(byte1, byte2, byte3); // raises the global variable flags, poll for this during the timing of when the player is prompted to hit
         LED_PS2(flagLeft, flagRight); // just checks if the flag system is working
-
+        // bufferReset();
         // if ((byte2 == (char)0xAA) && (byte3 == (char)0x00)){  // 10101010 and 00000000
         //     *(PS2_ptr) = 0xF4;        // 11111000
         // }
     }
+}
+
+void bufferReset(){
+    byte1 = 0xFF;
+    byte2 = 0xFF;
+    byte3 = 0xFF;
 }
 
 void PS_2STARTGAME(){
@@ -1147,15 +1159,15 @@ void HEX_PS2(char b1, char b2, char b3) {
 }
 
 void flagRaiseCheck(char b1, char b2, char b3) {
-    if (b1 == 0x1C) {
+    if (b1 == 0x1C && b2 != 0xF0) {
         flagLeft = 1;  // raised if the left key was pressed
-    } else if (b1 == 0x23) {
+    } else if (b1 == 0x23 && b2 != 0xF0) {
         flagRight = 1;  // raised if the right key was pressed
-    } else if (b1 == 0x1B){
+    } else if (b1 == 0x1B && b2 != 0xF0){
         flagLeft = 0;
         flagRight = 0;
         flagReset = 0;
-    } else if (b1 == 0x2D){
+    } else if (b1 == 0x2D && b2 != 0xF0){
         flagReset = 1;
     }
 }
@@ -1163,11 +1175,11 @@ void flagRaiseCheck(char b1, char b2, char b3) {
 void LED_PS2(int flagLeft, int flagRight) {
     volatile int *LEDR_ptr = (int *)LED_BASE;
     int ledValue = *LEDR_ptr;
-    if (flagLeft == 1 && ledValue == 0x0) { // needs to be fresh and flag is left
+    if (flagLeft == 1 && flagRight == 0 && ledValue == 0x00) { // needs to be fresh and flag is left
         printf("left flag raised \n");
         ledValue = 0x2;  // turns on the left LED
     }
-    if (flagRight == 1 && ledValue == 0x0) { // needs to be fresh and flag is right
+    if (flagRight == 1 && flagLeft == 0 && ledValue == 0x00) { // needs to be fresh and flag is right
         printf("right flag raised \n");
         ledValue = 0x1;  // turns on the right LED
     } 
@@ -1176,6 +1188,9 @@ void LED_PS2(int flagLeft, int flagRight) {
     }
     *LEDR_ptr = ledValue;
 }
+
+
+// ==================================================== MAIN.C ================================================
 
 
 #include "stdbool.h"
@@ -1217,68 +1232,68 @@ int main() {
 }
 
 void gameLoop(){
-    hitTime = 50;
+    hitTime = 20;
     scaleGravity(hitTime-3);
     setUpGame(1, hitTime);
     *(PS2_ptr) = 0xFF;
     currPos = 2;
     nextPos = 0; // default player's first hit will always be to the left
-    float netLocation = (OPPONENT_LOC_Z - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -685
-    float netToPlayerLocation = (netLocation - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -478
+    float netLocation = -600;
+    float netToPlayerLocation = -385; // should be like -478
 
     while(1){
 		updateFrame();
-        if(gameBall.centre[2] > netLocation){
-            // only allows an input when the ball is past the net
-            PS_2INPUT();
-        }
+        // printf("gameBall.centre[2]: %f\n", gameBall.centre[2]);
         // main game logic
+        flagLeft = 0;
+        flagRight = 0;
+        PS_2INPUT();
+        // printf("Flag left: %d\n", flagLeft);
+        // printf("Flag right: %d\n", flagRight);
         if (currPos == 0 || currPos == 1){
             // cpu turn
-            flagLeft = 0;
-            flagRight = 0;
-            if(gameBall.centre[2] < OPPONENT_LOC_Z){
+            if(gameBall.centre[2] < OPPONENT_LOC_Z){ // doesn't trigger until it reaches CPU
                 printf("current position: %d\n", currPos);
                 nextPos = CPUhitter();
+                printf("next position: %d\n", nextPos);
                 bounceBall(hitTime, currPos, nextPos);
+                bufferReset();
                 currPos = nextPos;
             }
         } else if (currPos == 2 || currPos == 3){
             // player turn
-
             bool hitPositive = false;
+            // doesn't trigger unless correct flag combination is raised with position
             // hit it from it's current position to the desired next position
-            if((flagLeft == 1 && flagRight == 0 && currPos == 2) || (flagLeft == 0 && flagRight == 1 && currPos == 3)){
-                printf("Flag left: %d\n", flagLeft);
-                printf("Flag right: %d\n", flagRight);
+            if(((flagLeft == 1 && flagRight == 0 && currPos == 2) || (flagLeft == 0 && flagRight == 1 && currPos == 3)) && gameBall.centre[2] > netLocation){
                 printf("current position: %d\n", currPos);
                 // check whether to hit it left or right next
-                if((gameBall.centre[2] > netLocation) && (gameBall.centre[2] < netToPlayerLocation)){
+                // printf("gameBall HIT location: %f\n", gameBall.centre[2]);
+                if((gameBall.centre[2] <= netToPlayerLocation) && gameBall.centre[2] > netLocation){
                     // between net and center of player side's table
                     nextPos = 0;
-                } else if ((gameBall.centre[2] > netToPlayerLocation) && (gameBall.centre[2] > PLAYER_LOC_Z)){
+                    printf("next pos is 0\n");
+                } else {
                     // between center of player side's table and player
                     nextPos = 1;
+                    printf("next pos is 1\n");
                 }
-
+                printf("next pos: %d\n", nextPos);
                 bounceBall(hitTime, currPos, nextPos);
-                currPos = nextPos; 
-                
+                currPos = nextPos;
+            
                 // misc cleanup per hit
+                bufferReset();
                 score++;
-                wipeScore(1,1,11);
+                // wipeScore(1,1,11);
                 updateScoreScreen(score);
                 updateHitTime();
 
                 // lower the flags after bouncing the ball
-                flagLeft = 0;
-                flagRight = 0;
-                printf("Flag lowered \n");
+                // printf("Flag lowered \n");
             }
 
         }
-
-        
 
         bool zboundcheck = (gameBall.centre[2] > (PLAYER_LOC_Z + 100))   || (gameBall.centre[2] < (OPPONENT_LOC_Z - 100));
         bool xboundcheck = (gameBall.centre[0] < (PLAYER_LOC_Z/2 - 50))  || (gameBall.centre[0] > (-PLAYER_LOC_Z/2 + 50));
@@ -1291,20 +1306,25 @@ void gameLoop(){
         
     }
 
-
-
 }
 
 void updateHitTime(){
-    if(hitTime > 5){
+    if(hitTime > 10){
         hitTime = hitTime - 3;
         scaleGravity(hitTime);
     }
 }
 
 int CPUhitter(){
-    double randNum = (double)rand() / RAND_MAX;
+    // Static variable to hold the state of the seed
+    static unsigned int seed = 0;
 
-    int CPUhitLocation = (int)randNum + 2;
-    return CPUhitLocation;
+    // Use XOR operation on the seed with a prime number
+    seed ^= 0x5A8E9039;
+
+    // Extract least significant bit of the seed
+    int random_bit = seed & 1;
+
+    // Return either 2 or 3 based on the random bit
+    return (random_bit == 0) ? 2 : 3;
 }

@@ -39,68 +39,68 @@ int main() {
 }
 
 void gameLoop(){
-    hitTime = 50;
+    hitTime = 20;
     scaleGravity(hitTime-3);
     setUpGame(1, hitTime);
     *(PS2_ptr) = 0xFF;
     currPos = 2;
     nextPos = 0; // default player's first hit will always be to the left
-    float netLocation = (OPPONENT_LOC_Z - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -685
-    float netToPlayerLocation = (netLocation - PLAYER_LOC_Z) / 2 + PLAYER_LOC_Z; // should be like -478
+    float netLocation = -600;
+    float netToPlayerLocation = -385; // should be like -478
 
     while(1){
 		updateFrame();
-        if(gameBall.centre[2] > netLocation){
-            // only allows an input when the ball is past the net
-            PS_2INPUT();
-        }
+        // printf("gameBall.centre[2]: %f\n", gameBall.centre[2]);
         // main game logic
+        flagLeft = 0;
+        flagRight = 0;
+        PS_2INPUT();
+        // printf("Flag left: %d\n", flagLeft);
+        // printf("Flag right: %d\n", flagRight);
         if (currPos == 0 || currPos == 1){
             // cpu turn
-            flagLeft = 0;
-            flagRight = 0;
-            if(gameBall.centre[2] < OPPONENT_LOC_Z){
+            if(gameBall.centre[2] < OPPONENT_LOC_Z){ // doesn't trigger until it reaches CPU
                 printf("current position: %d\n", currPos);
                 nextPos = CPUhitter();
+                printf("next position: %d\n", nextPos);
                 bounceBall(hitTime, currPos, nextPos);
+                bufferReset();
                 currPos = nextPos;
             }
         } else if (currPos == 2 || currPos == 3){
             // player turn
-
             bool hitPositive = false;
+            // doesn't trigger unless correct flag combination is raised with position
             // hit it from it's current position to the desired next position
-            if((flagLeft == 1 && flagRight == 0 && currPos == 2) || (flagLeft == 0 && flagRight == 1 && currPos == 3)){
-                printf("Flag left: %d\n", flagLeft);
-                printf("Flag right: %d\n", flagRight);
+            if(((flagLeft == 1 && flagRight == 0 && currPos == 2) || (flagLeft == 0 && flagRight == 1 && currPos == 3)) && gameBall.centre[2] > netLocation){
                 printf("current position: %d\n", currPos);
                 // check whether to hit it left or right next
-                if((gameBall.centre[2] > netLocation) && (gameBall.centre[2] < netToPlayerLocation)){
+                // printf("gameBall HIT location: %f\n", gameBall.centre[2]);
+                if((gameBall.centre[2] <= netToPlayerLocation) && gameBall.centre[2] > netLocation){
                     // between net and center of player side's table
                     nextPos = 0;
-                } else if ((gameBall.centre[2] > netToPlayerLocation) && (gameBall.centre[2] > PLAYER_LOC_Z)){
+                    printf("next pos is 0\n");
+                } else {
                     // between center of player side's table and player
                     nextPos = 1;
+                    printf("next pos is 1\n");
                 }
-
+                printf("next pos: %d\n", nextPos);
                 bounceBall(hitTime, currPos, nextPos);
-                currPos = nextPos; 
-                
+                currPos = nextPos;
+            
                 // misc cleanup per hit
+                bufferReset();
                 score++;
-                wipeScore(1,1,11);
+                // wipeScore(1,1,11);
                 updateScoreScreen(score);
                 updateHitTime();
 
                 // lower the flags after bouncing the ball
-                flagLeft = 0;
-                flagRight = 0;
-                printf("Flag lowered \n");
+                // printf("Flag lowered \n");
             }
 
         }
-
-        
 
         bool zboundcheck = (gameBall.centre[2] > (PLAYER_LOC_Z + 100))   || (gameBall.centre[2] < (OPPONENT_LOC_Z - 100));
         bool xboundcheck = (gameBall.centre[0] < (PLAYER_LOC_Z/2 - 50))  || (gameBall.centre[0] > (-PLAYER_LOC_Z/2 + 50));
@@ -113,20 +113,25 @@ void gameLoop(){
         
     }
 
-
-
 }
 
 void updateHitTime(){
-    if(hitTime > 5){
+    if(hitTime > 10){
         hitTime = hitTime - 3;
         scaleGravity(hitTime);
     }
 }
 
 int CPUhitter(){
-    double randNum = (double)rand() / RAND_MAX;
+    // Static variable to hold the state of the seed
+    static unsigned int seed = 0;
 
-    int CPUhitLocation = (int)randNum + 2;
-    return CPUhitLocation;
+    // Use XOR operation on the seed with a prime number
+    seed ^= 0x5A8E9039;
+
+    // Extract least significant bit of the seed
+    int random_bit = seed & 1;
+
+    // Return either 2 or 3 based on the random bit
+    return (random_bit == 0) ? 2 : 3;
 }
