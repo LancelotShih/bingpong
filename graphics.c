@@ -1110,9 +1110,9 @@ void drawShadow(){
     
     int x = radiusProjection;
     int y = 0;
-    int xChange = 1 - (radiusProjection << 1);
-    int yChange = 0;
-    int radiusError = 0;
+    int deltaX = 1 - (radiusProjection << 1);
+    int deltaY = 0;
+    int deltaRadius = 0;
     float shadowPoint[3] = {gameBall.centre[0],GROUND_Y,gameBall.centre[2]};
     short int drawPoint[2];
     projectPixel(0,shadowPoint,origin, &(ballShadow.pastCentre[0]),&(ballShadow.pastCentre[1]));
@@ -1151,13 +1151,13 @@ void drawShadow(){
         }
 
         y++;
-        radiusError += yChange;
-        yChange += 2;
-        if (((radiusError << 1) + xChange) > 0)
+        deltaRadius += deltaY;
+        deltaY += 2;
+        if (((deltaRadius << 1) + deltaX) > 0)
         {
             x--;
-            radiusError += xChange;
-            xChange += 2;
+            deltaRadius += deltaX;
+            deltaX += 2;
         }
     }
     
@@ -1511,12 +1511,13 @@ void simpleDrawBall( short int origin[3]){
 		return;
 	}
 	//draw ball based on radius current and centre screenLoc
-
+    //https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
+    //adapted circle drawing code
     int x = gameBall.currentProjectedRadius;
     int y = 0;
-    int xChange = 1 - (gameBall.currentProjectedRadius << 1);
-    int yChange = 0;
-    int radiusError = 0;
+    int deltaX = 1 - (gameBall.currentProjectedRadius << 1);
+    int deltaY = 0;
+    int deltaRadius = 0;
 
     while (x >= y)
     {
@@ -1532,23 +1533,24 @@ void simpleDrawBall( short int origin[3]){
         }
 
         y++;
-        radiusError += yChange;
-        yChange += 2;
-        if (((radiusError << 1) + xChange) > 0)
+        deltaRadius = deltaRadius + deltaY;
+        deltaY = deltaY + 2;
+        if (((deltaRadius << 1) + deltaX) > 0)
         {
+            deltaRadius =deltaRadius + deltaX;
+            deltaX = deltaX+ 2;
             x--;
-            radiusError += xChange;
-            xChange += 2;
         }
     }
 }
 void eraseSimpleBall(){
-
+    //https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
+    //adapted circle drawing code
     short int x = gameBall.pastProjectedRadius;
     short int y = 0;
-    short int xChange = 1 - (gameBall.pastProjectedRadius << 1);
-    short int yChange = 0;
-    short int radiusError = 0;
+    short int deltaX = 1 - (gameBall.pastProjectedRadius << 1);
+    short int deltaY = 0;
+    short int deltaRadius = 0;
     while (x >= y)
     {
         for (short int i = gameBall.pastScreenLoc[0] - x; i <= gameBall.pastScreenLoc[0] + x; i++)
@@ -1562,14 +1564,14 @@ void eraseSimpleBall(){
             plot_pixel(i, gameBall.pastScreenLoc[1] - x,tempFrame[i +(gameBall.pastScreenLoc[1] - x)*SCREENX]);
         }
 
+        deltaRadius = deltaRadius+ deltaY;
+        deltaY = deltaY+ 2;
         y++;
-        radiusError += yChange;
-        yChange += 2;
-        if (((radiusError << 1) + xChange) > 0)
+        if (((deltaRadius << 1) + deltaX) > 0)
         {
             x--;
-            radiusError += xChange;
-            xChange += 2;
+            deltaRadius = deltaRadius+ deltaX;
+            deltaX = deltaX+ 2;
         }
     }
 }
