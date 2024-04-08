@@ -883,7 +883,9 @@ void updateFrame();
 void bounceBall(short int hitTime, short int startPosition, short int nextPosition);
 void updateScoreScreen(int score);
 void video_text(int x, int y, char * text_ptr);
-void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
+void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]);
+void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]);
+
 
 void initilizePlane();
 void drawPlane();
@@ -930,7 +932,7 @@ struct shadow ballShadow;
 // 		updateFrame();
 // 	}
 // }
-void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]){
+void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]){
 	//green screen 
 	short int x = xLoc;
 	short int y = yLoc;
@@ -952,7 +954,7 @@ void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int 
 	
 }
 
-void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]) {
+void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]) {
   short int x = xLoc;
   short int y = yLoc;
   for (int pixel = 0; pixel < xSize * ySize; pixel++) {
@@ -1602,7 +1604,7 @@ void updateScoreScreen(int score){
     wipeScore(1,1,11);
     char text_ptr[11] = {'s','c','o','r','e',' ', '\0 ' };
     char number[3];
-    // sprintf(number, "%d", score);
+    sprintf(number, "%d", score);
     // printf(number);
     for (int index = 0; ; index++){
         text_ptr[6+index] = number[index];

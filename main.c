@@ -1,20 +1,20 @@
-#include "PS2.h"
+// ==================================================== MAIN.C ================================================
+
+#include "address_map_nios2.h"
 #include "stdbool.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "unistd.h"
-#include "time.h"
+#include "PS2.h"
 #include "graphics.h"
+#include "audio.h"
+
 
 
 /* GLOBAL VARIABLES */
 
 int score = 0;                // changed by game
-int difficulty = 3;
-int winScore;
-int turnTracker = 0;  // 0 is Player, 1 is CPU
-int defaultTime;
-int speedupMultiplier = 0.95;
+int CPUfailScore = 999999;
 
 int currPos = 1; // use these as conditionals for selecting which if statement to use
 int nextPos = 2;
@@ -27,20 +27,93 @@ int CPUhitter();
 int main() {
     startGraphics();
     initilizePlane();
-    drawImgBackground(pingpong);
-    drawPlane();
-    saveFrame();
-
+    // initializeAudioInterupts();
+    
     while(1){
+        while(1){
+            startScreen();
+            flagDifficulty = 0;
+            flagRestart = 0;
+            PS_2INPUT();
+            // switch (flagDifficulty){
+            //     case 1:
+            //         hitTime = 60;
+            //         CPUfailScore = 5;
+            //         break;
+            //     case 2:
+            //         hitTime = 55;
+            //         CPUfailScore = 10;
+            //         break;
+            //     case 3:
+            //         hitTime = 50;
+            //         CPUfailScore = 15;
+            //         break;
+            //     case 4:
+            //         hitTime = 50;
+            //         CPUfailScore = 999999;
+            //         break;
+            //     default:
+            //         hitTime = 50;
+            //         CPUfailScore = 999999;
+            // }
+            if(flagDifficulty == 1){
+                hitTime = 60;
+                CPUfailScore = 6;
+                printf("flag set 1 success\n");
+                flagDifficulty = 0;
+                break;
+            } else if (flagDifficulty == 2){
+                hitTime = 55;
+                CPUfailScore = 11;
+                printf("flag set 2 success\n");
+                flagDifficulty = 0;
+                break;
+            } else if (flagDifficulty == 3){
+                hitTime == 50;
+                CPUfailScore == 16;
+                printf("flag set 3 success\n");
+                flagDifficulty = 0;
+                break;
+            } else if (flagDifficulty == 4){
+                hitTime == 50;
+                CPUfailScore == 999;
+                printf("flag set 4 success\n");
+                flagDifficulty = 0;
+                break;
+            }
+        }
 
-        gameLoop();
-        score = 0;
+        drawImgBackground(pingpong);
+        drawPlane();
+        saveFrame();
+
+        while(1){
+            gameLoop();
+            if(flagRestart == 1){
+                score = 0;
+                break;
+            }
+            if(score >= CPUfailScore){
+                score = 0;
+                break;
+            }
+            score = 0;
+        }
+
+        while(1){
+            endScreen();
+            flagRestart = 0;
+            PS_2INPUT();
+            if(flagRestart == 1){
+                flagRestart = 0;
+                break;
+            }
+        }
     }
 }
 
 void gameLoop(){
-    hitTime = 20;
-    scaleGravity(hitTime-3);
+    scaleGravity(hitTime-2);
     setUpGame(1, hitTime);
     *(PS2_ptr) = 0xFF;
     currPos = 2;
@@ -59,13 +132,22 @@ void gameLoop(){
         // printf("Flag right: %d\n", flagRight);
         if (currPos == 0 || currPos == 1){
             // cpu turn
-            if(gameBall.centre[2] < OPPONENT_LOC_Z){ // doesn't trigger until it reaches CPU
+            if(gameBall.centre[2] < OPPONENT_LOC_Z && score < CPUfailScore){ // doesn't trigger until it reaches CPU
                 printf("current position: %d\n", currPos);
                 nextPos = CPUhitter();
                 printf("next position: %d\n", nextPos);
+                score++;
+                if(score >= CPUfailScore){
+                    drawImgBackground(tempFrame);
+                    break;
+                }
                 bounceBall(hitTime, currPos, nextPos);
                 bufferReset();
-                currPos = nextPos;
+                currPos = nextPos; 
+            } else if (flagRestart == 1){
+                flagRestart = 0;
+                printf("game force restarted \n");
+                break;
             }
         } else if (currPos == 2 || currPos == 3){
             // player turn
@@ -91,7 +173,7 @@ void gameLoop(){
             
                 // misc cleanup per hit
                 bufferReset();
-                score++;
+                
                 // wipeScore(1,1,11);
                 updateScoreScreen(score);
                 updateHitTime();

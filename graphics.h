@@ -826,7 +826,7 @@ extern volatile int * pixel_ctrl_ptr;
 extern const short int heightBall;
 extern int hitTime;
 extern int playerSpriteSide;
-extern int opponentSprite = 1;
+extern int opponentSprite;
 
 
 struct plane{
@@ -889,8 +889,8 @@ void saveFrame();
 void scaleGravity(int hitTime);
 void drawShadow();
 void eraseShadow();
-void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
-void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, short int sprite[]);
+void drawSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]);
+void eraseSprite(int xSize, int ySize, short int xLoc, short int yLoc, const short int sprite[]);
 void startScreen();
 void endScreen();
 

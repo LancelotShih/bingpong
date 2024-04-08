@@ -1,11 +1,16 @@
+// ==================================================== PS2.C ================================================
+
+
 #include "address_map_nios2.h"
 #include "stdbool.h"
 #include "stdio.h"
 #include "PS2.h"
 
+
 int flagLeft = 0;
 int flagRight = 0;
-int flagReset = 0;
+int flagRestart = 0;
+int flagDifficulty = 0;
 bool gameover = true;
 
 volatile int *PS2_ptr = (int *)PS2_BASE;
@@ -123,9 +128,22 @@ void flagRaiseCheck(char b1, char b2, char b3) {
     } else if (b1 == 0x1B && b2 != 0xF0){
         flagLeft = 0;
         flagRight = 0;
-        flagReset = 0;
+        flagRestart = 0;
     } else if (b1 == 0x2D && b2 != 0xF0){
-        flagReset = 1;
+        flagRestart = 1;
+        printf("restart flag raised \n");
+    } else if (b1 == 0x16 && b2 != 0xF0){
+        flagDifficulty = 1;
+        printf("difficulty 1 raised \n");
+    } else if (b1 == 0x1E && b2 != 0xF0){
+        flagDifficulty = 2;
+        printf("difficulty 2 raised \n");
+    } else if (b1 == 0x26 && b2 != 0xF0){
+        flagDifficulty = 3;
+        printf("difficulty 3 raised \n");
+    } else if (b1 == 0x25 && b2 != 0xF0){
+        flagDifficulty = 4;
+        printf("difficulty 4 raised \n");
     }
 }
 

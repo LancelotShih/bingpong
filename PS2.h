@@ -5,6 +5,8 @@
 extern bool gameover;  // changed by game
 extern int flagLeft;          // changed by PS2INPUT and reset by game
 extern int flagRight;         // changed by PS2INPUT and reset by game
+extern int flagDifficulty;    // changed by PS2INPUT and changes the difficulty at the beginning of the game
+extern int flagRestart;
 
 extern volatile int *PS2_ptr;
 extern int PS2_data, RVALID;
