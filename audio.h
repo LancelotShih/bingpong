@@ -2,7 +2,11 @@
 #define audio_h
 #include "nios2_ctrl_reg_macros.h"
 
+<<<<<<< HEAD
 static const int audioOutput[] = {
+=======
+const int output[] = {
+>>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
 	0x46464952, 0x000e0444, 0x45564157, 0x20746d66, 
 	0x00000010, 0x00010001, 0x00001f40, 0x00007d00, 
 	0x00200004, 0x61746164, 0x000e0338, 0x00220d38, 
@@ -57423,7 +57427,11 @@ static const int audioOutput[] = {
 /////////////audio interupt
 
 void interrupt_handler(void);
+<<<<<<< HEAD
 void audio_ISR();
+=======
+void audio_ISR(void);
+>>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
 void the_reset(void) __attribute__((section(".reset")));
 
 /* The assembly language code below handles CPU exception processing. This
@@ -57435,7 +57443,10 @@ void the_exception(void) __attribute__((section(".exceptions")));
 
 //Interrupt Service Routine
 void interrupt_handler(void);
+<<<<<<< HEAD
 struct audio_t *const audiop;
+=======
+>>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
 
 struct audio_t {
   volatile unsigned int control;
@@ -57447,9 +57458,16 @@ struct audio_t {
   volatile unsigned int rdata;
 };
 
+<<<<<<< HEAD
 
 extern volatile int songIndex;//global
 const int output_length;////////////remebeer these consts
+=======
+extern struct audio_t *const audiop;
+extern volatile int songIndex;//global
+const int output_length;////////////remebeer these consts
+void audio_ISR(void);
+>>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
 
 
 
