@@ -9,7 +9,7 @@ This is a simple ping pong game implemented for the Nios II. The game allows a p
 - Realistic ball physics
 - Score tracking
 
-![alt text](https://github.com/LancelotShih/bingpong/blob/main/Screenshot 2024-04-08 232305.png?raw=true)
+![alt text](https://github.com/LancelotShih/bingpong/blob/main/Screenshot2024-04-08232305.png?raw=true)
 
 
 ## Installation
