@@ -208,6 +208,7 @@ void audio_ISR(void){
 // }
 
 // ==================================================== MAIN.C ================================================
+// This project was created by Lancelot Shih and Laura Lin
 
 #include "address_map_nios2.h"
 #include "stdbool.h"
