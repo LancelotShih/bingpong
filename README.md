@@ -9,6 +9,9 @@ This is a simple ping pong game implemented for the Nios II. The game allows a p
 - Realistic ball physics
 - Score tracking
 
+![alt text](https://github.com/LancelotShih/bingpong/blob/main/Screenshot 2024-04-08 232305.png?raw=true)
+
+
 ## Installation
 1. Clone the repository: `git clone https://github.com/your-username/ping-pong-game.git`
 2. Navigate to the project directory: `cd .../bingpong/src`
