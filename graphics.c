@@ -1032,6 +1032,7 @@ void initilizePlane(){
 }
 
 void drawPlane(){
+    //adapted verssion of bresenham line algorithm (draw horizontal lines between 2 diagonals)
 	for(int j =0; j<=1; j++){
 		short int x0Left = table.point1[0];
 		short int y0Left = table.point1[1];
@@ -1120,7 +1121,7 @@ void drawShadow(){
     short int drawPoint[2];
     projectPixel(0,shadowPoint,origin, &(ballShadow.pastCentre[0]),&(ballShadow.pastCentre[1]));
     //ballShadow.pastRadiusScreen = -radiusProjection/(gameBall.centre[2])*SCREENX;
-
+    //circle drawing algorithm adapted from https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
     while (x >= y)
     {
         for (int i = gameBall.centre[0] - x; i <= gameBall.centre[0] + x; i++)
@@ -1414,6 +1415,7 @@ void wait_for_vsync(){
 void draw_line(short int x0, short int y0, short int x1, short int y1,short int line_colour){
 	bool is_steep = abs(y1-y0)>abs(x1-x0);
 	int temp;
+    //line bresenham algorithm used
 	if(is_steep){
 		temp = x0; 
 		x0 = y0;
@@ -1518,8 +1520,8 @@ void simpleDrawBall( short int origin[3]){
 		return;
 	}
 	//draw ball based on radius current and centre screenLoc
-    //https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
-    //adapted circle drawing code
+    //circle drawing algorithm adapted from https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
+
     int x = gameBall.currentProjectedRadius;
     int y = 0;
     int deltaX = 1 - (gameBall.currentProjectedRadius << 1);

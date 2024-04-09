@@ -1,3 +1,4 @@
+//song sampled from ABBA super trouper
 const output[] = {
 	0x46464952, 0x000e0444, 0x45564157, 0x20746d66, 
 	0x00000010, 0x00010001, 0x00001f40, 0x00007d00, 

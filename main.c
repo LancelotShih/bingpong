@@ -1,5 +1,6 @@
 #include "audio.h"
-
+//interupt handler, nios 2 control reg macros, and reset code are from 
+//DE1-soc Nios II manual
 
 /////////////audio interupt
 #define NIOS2_READ_STATUS(dest) \
