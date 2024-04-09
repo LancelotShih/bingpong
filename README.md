@@ -25,7 +25,7 @@ This is a simple ping pong game implemented for the Nios II. The game allows a p
 Game was created by Lancelot Shih and Laura Lin as a part of our ECE243 final course project
 
 ## License
-This project is licensed under the [MIT License](LICENSE).All rights reserved.
+This project is licensed under the [MIT License](LICENSE). All rights reserved.
 
 ## Copyright Disclaimer
 Lancelot Shih and Laura Lin retain all intellectual property rights to this project. You may use, modify, and distribute this code under the terms of the MIT license. Any use of this code must include proper attribution to the original author.
