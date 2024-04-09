@@ -12,6 +12,8 @@ int flagRight = 0;
 int flagRestart = 0;
 int flagDifficulty = 0;
 bool gameover = true;
+int flagRTXon = 0;
+int flagRTXoff = 0;
 
 volatile int *PS2_ptr = (int *)PS2_BASE;
 int PS2_data, RVALID;
@@ -144,6 +146,14 @@ void flagRaiseCheck(char b1, char b2, char b3) {
     } else if (b1 == 0x25 && b2 != 0xF0){
         flagDifficulty = 4;
         printf("difficulty 4 raised \n");
+    } else if (b1 == 0x34 && b2 != 0xF0){
+        flagRTXon = 1;
+        // flagRTXoff = 0;
+        printf("rtx ON\n");
+    } else if (b1 == 0x33 && b2 != 0xF0){
+        // flagRTXon = 0;
+        flagRTXon = 0;
+        printf("rtx OFF\n");
     }
 }
 

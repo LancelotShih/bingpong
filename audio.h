@@ -1,12 +1,4 @@
-#ifndef audio_h
-#define audio_h
-#include "nios2_ctrl_reg_macros.h"
-
-<<<<<<< HEAD
-static const int audioOutput[] = {
-=======
-const int output[] = {
->>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
+const output[] = {
 	0x46464952, 0x000e0444, 0x45564157, 0x20746d66, 
 	0x00000010, 0x00010001, 0x00001f40, 0x00007d00, 
 	0x00200004, 0x61746164, 0x000e0338, 0x00220d38, 
@@ -57422,70 +57414,3 @@ const int output[] = {
 	0x00004b43, 0x00000300, 0x00313000
 };
 
-
-
-/////////////audio interupt
-
-void interrupt_handler(void);
-<<<<<<< HEAD
-void audio_ISR();
-=======
-void audio_ISR(void);
->>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
-void the_reset(void) __attribute__((section(".reset")));
-
-/* The assembly language code below handles CPU exception processing. This
- * code should not be modified; instead, the C language code in the function
- * interrupt_handler() can be modified as needed for a given application.
- */
-
-void the_exception(void) __attribute__((section(".exceptions")));
-
-//Interrupt Service Routine
-void interrupt_handler(void);
-<<<<<<< HEAD
-struct audio_t *const audiop;
-=======
->>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
-
-struct audio_t {
-  volatile unsigned int control;
-  volatile unsigned char rarc;
-  volatile unsigned char ralc;
-  volatile unsigned char wsrc;
-  volatile unsigned char wslc;
-  volatile unsigned int ldata;
-  volatile unsigned int rdata;
-};
-
-<<<<<<< HEAD
-
-extern volatile int songIndex;//global
-const int output_length;////////////remebeer these consts
-=======
-extern struct audio_t *const audiop;
-extern volatile int songIndex;//global
-const int output_length;////////////remebeer these consts
-void audio_ISR(void);
->>>>>>> 64c630397440e5422eb04a97235db8ece0e9cf0c
-
-
-
-/// //////////////interupt end
-
-
-void initializeAudioInterupts();
-
-// int main(void) {
-//     audiop -> control = 0x2; //enable we to generate interupts
-//     NIOS2_WRITE_IENABLE(0x40);
-//     NIOS2_WRITE_STATUS( 1 );
- 
-//   // audio_playback_mono(output, output_length);
-//   int e =0;
-//   while (1) {
-//     e+= 2;
-//     // audio_playback_mono(output, output_length);
-//   }
-// }
-#endif

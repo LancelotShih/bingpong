@@ -811,6 +811,7 @@ static const short endgame[]  = {
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
+#include <PS2.h>
 
 
 struct plane{
@@ -1304,6 +1305,7 @@ void bounceBall(short int hitTime, short int startPosition, short int nextPositi
 void updateFrame(){
 	eraseSimpleBall();
     eraseShadow();
+    // printf("flag checked, shadow erased\n");
     if(opponentSprite == 0){
         eraseSprite(30, 22, table.point2[0]-30 , table.point1[1]-20, smallPaddle);
         drawSprite(30, 22, table.point1[0]+10 , table.point1[1]-20, smallPaddle);
@@ -1312,7 +1314,10 @@ void updateFrame(){
         eraseSprite(30, 22, table.point1[0]+10 , table.point1[1]-20, smallPaddle);
         drawSprite(30, 22, table.point2[0]-30 , table.point1[1]-20, smallPaddle);
     }
-    drawShadow();
+    if(flagRTXon == 1){
+        drawShadow();
+        // printf("flag checked, shadow drawn\n");
+    }
 	simpleDrawBall(origin); 
 	if(playerSpriteSide==2){
         eraseSprite(68, 50, SCREENX / 4 * 3, SCREENY - 40, paddle);
