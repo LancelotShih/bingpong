@@ -11,6 +11,8 @@ This is a simple ping pong game implemented for the Nios II. The game allows a p
 
 <img src="https://github.com/LancelotShih/bingpong/blob/main/archived/Screenshot2024-04-08232305.png" title="gameplay" width=50% height=50%>
 
+https://github.com/LancelotShih/bingpong/assets/44293074/cd0d9674-0676-43d6-87c6-eaeadf46de24
+
 ## Installation
 1. Clone the repository: `git clone https://github.com/your-username/ping-pong-game.git`
 2. Navigate to the project directory: `cd .../bingpong/src`
